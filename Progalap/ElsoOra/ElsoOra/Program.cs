@@ -14,8 +14,13 @@ namespace ElsoOra
         static void Main(string[] args)
         {
             int n;
-            int.TryParse(Console.ReadLine(),out n);
+
+            Console.WriteLine("Hány napnyi adatot adna meg?");
+            while(!int.TryParse(Console.ReadLine(), out n))
+                Console.WriteLine("Számot adjon meg!");
             int db = 0;
+
+            Console.WriteLine("Adja meg a mért hőmérsékleteket, sortöréssel elválasztva");
             for (int i = 0; i < n; i++)
                 try
                 {
