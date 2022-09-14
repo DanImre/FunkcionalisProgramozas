@@ -1,0 +1,16 @@
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.exe
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.deps.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.runtimeconfig.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.runtimeconfig.dev.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ref\ElsoOra.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\bin\Debug\net5.0\ElsoOra.pdb
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.csproj.AssemblyReference.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.AssemblyInfoInputs.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.AssemblyInfo.cs
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.csproj.CoreCompileInputs.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ref\ElsoOra.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.pdb
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ElsoOra\ElsoOra\obj\Debug\net5.0\ElsoOra.genruntimeconfig.cache
