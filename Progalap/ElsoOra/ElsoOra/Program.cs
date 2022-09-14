@@ -13,8 +13,8 @@ namespace ElsoOra
     {
         static void Main(string[] args)
         {
-            int n = 0; 
-            int.TryParse(Console.ReadLine(), out n);
+            int n;
+            int.TryParse(Console.ReadLine(),out n);
             int db = 0;
             for (int i = 0; i < n; i++)
                 try
