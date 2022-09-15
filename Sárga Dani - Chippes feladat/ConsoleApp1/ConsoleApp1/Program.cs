@@ -36,10 +36,11 @@ namespace ConsoleApp1
                 {
                     --i;
                     ClearCurrentConsoleLine();
-                    Console.Write("(,) formátumba adja meg! ");
+                    Console.Write("(0-1,0-1) formátumba adja meg! ");
                 }
             }
 
+            //megoldási kisérlet:
 
         }
 
