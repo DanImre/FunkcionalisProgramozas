@@ -16,7 +16,7 @@ namespace ElsoOra
             int n;
 
             Console.WriteLine("Hány napnyi adatot adna meg?");
-            while(!int.TryParse(Console.ReadLine(), out n))
+            while (!int.TryParse(Console.ReadLine(), out n))
                 Console.WriteLine("Számot adjon meg!");
             int db = 0;
 
@@ -36,5 +36,6 @@ namespace ElsoOra
 
             Console.WriteLine("Fagypont alatti hőmérséklet " + db + " db napon volt.");
         }
+
     }
 }
