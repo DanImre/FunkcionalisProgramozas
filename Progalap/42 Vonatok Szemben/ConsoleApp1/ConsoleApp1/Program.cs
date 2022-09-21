@@ -97,16 +97,36 @@ namespace ConsoleApp1
             int aktPIPI = P_ind;
             (int where, int howMuch) varakozas = (0, 0);*/
 
-            (int megallo, int elteltido) aktKUKU = (0,0);
-            (int megallo, int elteltido) aktPIPI = (0,0);
+            int aktKUKUmeg = 0;
+            int aktPIPImeg = x.Count - 1;
             int time = 0;
             while (true)
             {
+                ++time;
+
                 //KUKU:
-                if(x[aktKUKU.megallo].idoFromLeft == 0)
+                if (x[aktKUKUmeg].idoFromLeft == 0)
                 {
-                    if(x[aktKUKU.megallo].megalleKukutyin.HasValue)
+                    if (!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0)
+                        aktKUKUmeg += 1;
+                    else
+                        x[aktKUKUmeg].megalleKukutyin -= 1;
                 }
+                else
+                    x[aktKUKUmeg].idoFromLeft -= 1;
+
+                //PIPI:
+                if (x[aktPIPImeg].idoFromRight == 0)
+                {
+                    if (!x[aktPIPImeg].megallePiripócs.HasValue || x[aktPIPImeg].megallePiripócs.Value == 0)
+                        aktPIPImeg += 1;
+                    else
+                        x[aktPIPImeg].megallePiripócs -= 1;
+                }
+                else
+                    x[aktPIPImeg].idoFromRight -= 1;
+
+                //ha ugyanazon az úton vannak (pl 0 és 1) megnézzük hogy karambol lenne-e, ha igen a később indulót várakoztatjuk és számoljuk
             }
             /*
             for (int i = 0; i < x.Count-1; i++)
