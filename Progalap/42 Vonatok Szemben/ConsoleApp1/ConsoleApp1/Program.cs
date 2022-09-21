@@ -119,7 +119,7 @@ namespace ConsoleApp1
                 if (x[aktPIPImeg].idoFromRight == 0)
                 {
                     if (!x[aktPIPImeg].megallePiripócs.HasValue || x[aktPIPImeg].megallePiripócs.Value == 0)
-                        aktPIPImeg += 1;
+                        aktPIPImeg -= 1;
                     else
                         x[aktPIPImeg].megallePiripócs -= 1;
                 }
@@ -127,6 +127,12 @@ namespace ConsoleApp1
                     x[aktPIPImeg].idoFromRight -= 1;
 
                 //ha ugyanazon az úton vannak (pl 0 és 1) megnézzük hogy karambol lenne-e, ha igen a később indulót várakoztatjuk és számoljuk
+                if (aktPIPImeg - aktKUKUmeg == 1)
+                {
+                    int tempKUKU = x[aktKUKUmeg].megalleKukutyin.HasValue ? x[aktKUKUmeg].megalleKukutyin.Value : 0;
+                    int tempPIPI = x[aktPIPImeg].megallePiripócs.HasValue ? x[aktPIPImeg].megallePiripócs.Value : 0;
+                    if(tempKUKU > )
+                }
             }
             /*
             for (int i = 0; i < x.Count-1; i++)
