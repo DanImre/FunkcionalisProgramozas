@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "oYoxGCGtCvUcvpK5bs9x2sNsUSI3+DgtXCrJMxbevmcm3TnIlRuGSGn2JcqIHRdYAe7KOuQ1tuhZWtvZOY7Ujg==",
   "success": true,
   "projectFilePath": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+=======
+  "dgSpecHash": "mru6p/FwVfmUQ0lg/JVRHzGwetLnF6k/I0fwe582/6Q9Gp7R58YCLG7cbt4h5IoGXROjhs2R57WjShg5Wg2a7w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+>>>>>>> 2ff32b26f0a8fe20e4bd7229edf440004162357a
   "expectedPackageFiles": [],
   "logs": []
 }
