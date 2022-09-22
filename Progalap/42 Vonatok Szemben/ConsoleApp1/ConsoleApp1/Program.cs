@@ -89,75 +89,88 @@ namespace ConsoleApp1
                     x[i].megallePiripócs = varakozasokPIRI[i];
             }
 
-            x.Insert(0, new megallo(K_ind, menetidoMegallokKozott[0], -1, -1));
-            x.Insert(x.Count, new megallo(menetidoMegallokKozott[menetidoMegallokKozott.Count-1],P_ind, -1, -1));
+            x.Insert(0, new megallo(0, menetidoMegallokKozott[0], -1, K_ind));
+            x.Insert(x.Count, new megallo(menetidoMegallokKozott[menetidoMegallokKozott.Count-1],0, P_ind, -1));
+            
             //3. feladat
-            /*
-            int aktKUKU = K_ind;
-            int aktPIPI = P_ind;
-            (int where, int howMuch) varakozas = (0, 0);*/
-
             int aktKUKUmeg = 0;
             int aktPIPImeg = x.Count - 1;
             int time = 0;
-            while (true)
+            int waitTillKukuGoes = 0;
+            int waitTillPipiGoes = x.Count-1;
+
+            int TimeTakenKuku = 0;
+            int TimeTakenPipi = 0;
+            while ((TimeTakenKuku == 0 || TimeTakenPipi == 0) && time < 1000)
             {
                 ++time;
 
                 //KUKU:
-                if (x[aktKUKUmeg].idoFromLeft == 0)
+                if (waitTillPipiGoes == aktPIPImeg)
                 {
-                    if (!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0)
-                        aktKUKUmeg += 1;
+                    if (x[aktKUKUmeg].idoFromRight == 0)
+                    {
+                        if (!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0)
+                        {
+
+
+                            ++aktKUKUmeg;
+                            waitTillKukuGoes = aktKUKUmeg;
+                        }
+                        else
+                            x[aktKUKUmeg].megalleKukutyin -= 1;
+                    }
                     else
-                        x[aktKUKUmeg].megalleKukutyin -= 1;
+                        x[aktKUKUmeg].idoFromRight -= 1;
                 }
-                else
-                    x[aktKUKUmeg].idoFromLeft -= 1;
+                else if (x[aktKUKUmeg].megalleKukutyin.HasValue && x[aktKUKUmeg].megalleKukutyin.Value != 0)
+                    --x[aktKUKUmeg].megalleKukutyin;
 
                 //PIPI:
-                if (x[aktPIPImeg].idoFromRight == 0)
+                if (waitTillKukuGoes == aktKUKUmeg)
                 {
-                    if (!x[aktPIPImeg].megallePiripócs.HasValue || x[aktPIPImeg].megallePiripócs.Value == 0)
-                        aktPIPImeg -= 1;
+                    if (x[aktPIPImeg].idoFromLeft == 0)
+                    {
+                        if (!x[aktPIPImeg].megallePiripócs.HasValue || x[aktPIPImeg].megallePiripócs.Value == 0)
+                        {
+                            --aktPIPImeg;
+                            waitTillPipiGoes = aktPIPImeg;
+                        }
+                        else
+                            x[aktPIPImeg].megallePiripócs -= 1;
+                    }
                     else
-                        x[aktPIPImeg].megallePiripócs -= 1;
+                        x[aktPIPImeg].idoFromLeft -= 1;
                 }
-                else
-                    x[aktPIPImeg].idoFromRight -= 1;
+                else if (x[aktPIPImeg].megallePiripócs.HasValue && x[aktPIPImeg].megallePiripócs.Value != 0)
+                    --x[aktPIPImeg].megallePiripócs;
 
                 //ha ugyanazon az úton vannak (pl 0 és 1) megnézzük hogy karambol lenne-e, ha igen a később indulót várakoztatjuk és számoljuk
-                if (aktPIPImeg - aktKUKUmeg == 1)
+                if(waitTillKukuGoes == aktKUKUmeg && waitTillPipiGoes == aktPIPImeg)
+                if (aktPIPImeg - aktKUKUmeg == 1 && ((!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0) || (!x[aktPIPImeg].megalleKukutyin.HasValue || x[aktPIPImeg].megalleKukutyin.Value == 0)))
                 {
                     int tempKUKU = x[aktKUKUmeg].megalleKukutyin.HasValue ? x[aktKUKUmeg].megalleKukutyin.Value : 0;
                     int tempPIPI = x[aktPIPImeg].megallePiripócs.HasValue ? x[aktPIPImeg].megallePiripócs.Value : 0;
-                    if(tempKUKU > )
+
+                    if (tempKUKU != 0 && tempPIPI == 0)
+                    {
+                        --waitTillPipiGoes;
+                    }
+                    else
+                    {
+                        ++waitTillKukuGoes;
+                    }
                 }
+
+                if (aktKUKUmeg == x.Count - 1)
+                    TimeTakenKuku = time;
+                if (aktPIPImeg == 0)
+                    TimeTakenPipi = time;
+
+                Console.WriteLine("time : " + time + " KUKU waiting ? " + (waitTillKukuGoes != aktKUKUmeg ? "Igen" : "Nem") + " PIPI waiting ? " + (waitTillPipiGoes != aktPIPImeg ? "Igen" : "Nem"));
             }
-            /*
-            for (int i = 0; i < x.Count-1; i++)
-            {
-                if(Math.Abs(i - (x.Count-1 -i)) == 1 //(i,aktKUKU,aktPIPI))
-                {
-                    //kevesebb e az odaút, mint a várakozási idő
-                    if (x[i].idoFromRight > x[x.Count - 1 - i].idoFromLeft) //aktPIPI indul előbb, neki van elsőbbség
-                    {
-                        varakozas = ((x.Count - 1 - i), );
-                    }
-                    else //aktKUKu elsőbbség
-                    {
 
-                    }
-                }
-                aktKUKU += x[i].idoFromLeft;
-                if (x[i].megalleKukutyin.HasValue)
-                    aktKUKU += x[i].megalleKukutyin.Value;
-
-                aktPIPI += x[x.Count - i - 1].idoFromRight;
-                if (x[x.Count - i - 1].megallePiripócs.HasValue)
-                    aktPIPI += x[x.Count - i - 1].megallePiripócs.Value;
-
-            }*/
+            Console.WriteLine(TimeTakenKuku + " " + TimeTakenPipi);
         }
     }
 }
