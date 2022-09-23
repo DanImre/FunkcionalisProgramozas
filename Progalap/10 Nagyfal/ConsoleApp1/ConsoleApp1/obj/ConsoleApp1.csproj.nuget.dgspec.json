@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {}
+    "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {}
   },
   "projects": {
-    "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {
+    "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+        "projectUniqueName": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
         "projectName": "ConsoleApp1",
-        "projectPath": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-        "packagesPath": "C:\\Users\\Sándor Judith\\.nuget\\packages\\",
-        "outputPath": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\obj\\",
+        "projectPath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+        "packagesPath": "C:\\Users\\19dar\\.nuget\\packages\\",
+        "outputPath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\10 Nagyfal\\ConsoleApp1\\ConsoleApp1\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Sándor Judith\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\19dar\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -53,12 +53,18 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[3.1.25, 3.1.25]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.408\\RuntimeIdentifierGraph.json"
         }
       }
     }
