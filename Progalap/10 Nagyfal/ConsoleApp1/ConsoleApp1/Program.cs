@@ -22,10 +22,8 @@ namespace ConsoleApp1
                     falszakasz.Add(i - 1, "vedett");
                 else
                     falszakasz.Add(i - 1, "semmi");
-            /*
-            Console.WriteLine();
-            Console.WriteLine(falszakasz.Count);*/
-            Console.WriteLine(falszakasz.Count(kk => kk.Value == "orzott"));
+
+            Console.WriteLine(falszakasz.Count(kk => kk.Value == "orzott" || kk.Value == "vedett" ));
 
             //2. feladat
             int db = 0;
@@ -57,7 +55,7 @@ namespace ConsoleApp1
                 if (falszakasz[i] == "vedett")
                     tempStart = i;
 
-                while (falszakasz[i] == "vedett" && i < falszakasz.Count)
+                while (i < falszakasz.Count && falszakasz[i] == "vedett")
                     ++i;
 
                 if (tempStart.HasValue)
@@ -73,7 +71,7 @@ namespace ConsoleApp1
                     }
             }
 
-            Console.WriteLine((start + 1) + " " + (end));
+            Console.WriteLine((start + 1) + " " + (end + 1));
         }
     }
 }

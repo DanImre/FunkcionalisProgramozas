@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "v3o3JQKMtILlsojxc+HOJPpgrKW6BsiuVKCTBFBhQoVTS8nkg7m6XnGv0l4TSLNiQqMBKcXUTFER36UhBTNlYg==",
+  "dgSpecHash": "i4KMmZOslnkxMIP16Lneghaik4v/D8RDxfENOL7XIUa/gp8kdE7g9kP4WH5XZVKf69h6/BNAHWFsl9fp8Z+AQA==",
   "success": true,
   "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\42 Vonatok Szemben\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
+  ],
   "logs": []
 }
