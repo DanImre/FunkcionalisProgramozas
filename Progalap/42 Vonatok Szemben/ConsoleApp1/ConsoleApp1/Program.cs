@@ -78,13 +78,13 @@ namespace ConsoleApp1
             //3. feladat
             Console.WriteLine("#");
             (int utolsoMegallo, int lepes) KUKU = (0, 0);
-            (int utolsoMegallo, int lepes) PIPI = (x.Count-1, 0);
+            (int utolsoMegallo, int lepes) PIPI = (x.Count, 0);
             int ido = 0;
             while (true)
             {
                 int tempIdo = x[KUKU.utolsoMegallo].varKUKU + x[KUKU.utolsoMegallo].jobbraIDO;
-                KUKU = (KUKU.utolsoMegallo + 1, 0);
-
+                var tempKUKU = (KUKU.utolsoMegallo + 1, 0);
+                var tempPIPI = (PIPI.utolsoMegallo, PIPI.lepes);
                 while (tempIdo == 0)
                 {
                     if (x[PIPI.utolsoMegallo].varPIPI != 0)
@@ -92,13 +92,23 @@ namespace ConsoleApp1
                     else
                     {
                         if (PIPI.lepes != x[PIPI.utolsoMegallo].balraIDO)
-                            ++PIPI.lepes;
+                            tempPIPI = (tempPIPI.utolsoMegallo, tempPIPI.lepes + 1);
                         else
-                            PIPI = (PIPI.utolsoMegallo + 1, 0);
+                            tempPIPI = (tempPIPI.utolsoMegallo - 1, 0);
                     }
                     --tempIdo;
                 }
+                if (tempKUKU.Item1 > tempPIPI.utolsoMegallo || (tempKUKU.Item1 == tempPIPI.utolsoMegallo && tempPIPI.lepes > 0)) //Túlment
+                {
 
+                }
+                else if (tempKUKU.Item1 < tempPIPI.utolsoMegallo || (tempKUKU.Item1 == tempPIPI.utolsoMegallo && tempPIPI.lepes == 0))//mehet tovább mert egyszerre értek be
+                {
+
+                }
+
+                //meg kell nézni, hogyha megvárjuk a várakozási időt KUKU val akkor elindul e
+                //else if(tempKUKU.Item1 + 1 == tempPIPI.utolsoMegallo && tempKUKU.Item2 == tempPIPI.lepes)//pont egyszerre értek be a megá
                 //ha továbbment mint az első, akkor az elsőnek várakoznia kell, ha pont ugyanott vannak vagy még nem ment túl az elsőn akkor mehet tovább
 
             }
