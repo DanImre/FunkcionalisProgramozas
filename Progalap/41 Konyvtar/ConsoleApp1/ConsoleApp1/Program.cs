@@ -20,6 +20,7 @@ namespace ConsoleApp1
             public int temakod { get; set; }
             public int beszerzesEve { get; set; }
             public int db { get; set; }
+        }
             static void Main(string[] args)
             {
                 int n = int.Parse(Console.ReadLine());
@@ -55,7 +56,6 @@ namespace ConsoleApp1
                 //3. feladat
                 Console.WriteLine("#");
 
-                int maxKod = 0;
                 Dictionary<int, int> konyvek = new Dictionary<int, int>();
                 foreach (var item in x)
                     if (konyvek.ContainsKey(item.konyvkod))
@@ -104,6 +104,5 @@ namespace ConsoleApp1
                 foreach (var item in temakod)
                     Console.WriteLine(item.Key + " " + item.Value);
             }
-        }
     }
 }
