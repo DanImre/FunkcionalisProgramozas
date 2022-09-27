@@ -19,7 +19,7 @@ boolExpr2 :: Bool
 boolExpr3 :: Bool
 boolExpr1 = False
 boolExpr2 = True
-boolExpr3 = False
+boolExpr3 = not (False)
 
 
 --Virágültetés (bekérés nélkül)
