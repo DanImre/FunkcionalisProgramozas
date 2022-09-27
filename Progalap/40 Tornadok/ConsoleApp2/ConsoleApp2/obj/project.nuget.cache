@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "y2sB/c09pBSuKxtkHI4MNcAe3CEOJZVn/1/7vrJx6sPL4p4EUlEQu+OtfRiQa5BDnL1r4uOrFfuBeBTSzW/Fnw==",
+  "success": true,
+  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\40 Tornadok\\ConsoleApp2\\ConsoleApp2\\ConsoleApp2.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
+  ],
+  "logs": []
+}

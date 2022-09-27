@@ -75,6 +75,36 @@ namespace ConsoleApp1
                 Console.WriteLine(0);
             else
                 Console.WriteLine((start + 1) + " " + end);
+
+
+        }
+
+        public class futtasd
+        {
+            public futtasd()
+            {
+                var a = rec(0, 0, new List<int>());
+            }
+            public List<(int kezdes, int veg)> lista = new List<(int kezdes, int veg)>();
+
+            public (List<int> lista, int nap) rec(int index, int napszam, List<int> indexlista, int ido)
+            {
+                if (index == lista.Count)
+                    return (indexlista, napszam);
+
+                var return1 = rec(index + 1, napszam, indexlista, ido + ido);
+                if (lista[index].veg <= ido)
+                    return return1;
+
+                List<int> masolat = new List<int>(indexlista);
+                masolat.Add(index);
+                var return2 = rec(++index, napszam + lista[index].veg - lista[index].kezdes + 1, masolat);
+
+                if (return1.nap > return2.nap)
+                    return return1;
+
+                return return2;
+            }
         }
     }
 }

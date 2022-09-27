@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleApp1
 {
@@ -7,18 +8,25 @@ namespace ConsoleApp1
     {
         class megallo
         {
-            public int? megallePiripócs { get; set; }
-            public int? megalleKukutyin { get; set; }
+            public int varKUKU { get; set; }
+            public int varPIPI { get; set; }
+            public int balraIDO { get; set; }
+            public int jobbraIDO { get; set; }
 
-            public int idoFromLeft { get; set; }
-            public int idoFromRight { get; set; }
-
-            public megallo(int _idoFromLeft, int _idoFromRight, int? _megallePiripócs = null, int? _megalleKukutyin = null)
+            public megallo(int _varKUKU, int _varPIPI, int _balraIDO, int _jobbraIDO)
             {
-                idoFromLeft = _idoFromLeft;
-                idoFromRight = _idoFromRight;
-                megallePiripócs = _megallePiripócs;
-                megalleKukutyin = _megalleKukutyin;
+                this.varKUKU = _varKUKU;
+                this.varPIPI = _varPIPI;
+                this.balraIDO = _balraIDO;
+                this.jobbraIDO = _jobbraIDO;
+            }
+
+            public megallo()
+            {
+                this.varKUKU = 0;
+                this.varPIPI = 0;
+                this.balraIDO = 0;
+                this.jobbraIDO = 0;
             }
         }
         static void Main(string[] args)
@@ -28,149 +36,82 @@ namespace ConsoleApp1
             int P_ind = int.Parse(s[1]);
             int n = int.Parse(s[2]);
 
-            s = Console.ReadLine().Split(' ');//idők
-            List<int> menetidoMegallokKozott = new List<int>();
-            foreach (var item in s)
-                menetidoMegallokKozott.Add(int.Parse(item));
+            List<megallo> x = new List<megallo>();
+            for (int i = 0; i < n + 2; i++)
+                x.Add(new megallo());
 
-            string[] varakozasokKUKUSTRING = Console.ReadLine().Split(' ');//varakozás Kukutyinból
-            List<int> varakozasokKUKU = new List<int>();
-            foreach (var item in varakozasokKUKUSTRING)
-                varakozasokKUKU.Add(int.Parse(item));
-            string[] varakozasokPIRISTRING = Console.ReadLine().Split(' ');//varakozás Piripócs
-            List<int> varakozasokPIRI = new List<int>();
-            foreach (var item in varakozasokPIRISTRING)
-                varakozasokPIRI.Add(int.Parse(item));
+            s = Console.ReadLine().Split(' ');
+            x[0].jobbraIDO = int.Parse(s[0]);
+            x[0].varKUKU = K_ind;
+            x[x.Count - 1].balraIDO = int.Parse(s[s.Length - 1]);
+            x[x.Count - 1].varPIPI = P_ind;
+            for (int i = 1; i < n+1; i++)
+            {
+                x[i].jobbraIDO = int.Parse(s[i]);
+                x[i].balraIDO = int.Parse(s[i - 1]);
+            }
 
-            int db = 0;
+            s = Console.ReadLine().Split(' ');
             for (int i = 0; i < n; i++)
-                if (varakozasokKUKU[i] == 0 && varakozasokPIRI[n - i - 1] == 0)
-                    ++db;
+                x[i + 1].varKUKU = int.Parse(s[i]);
+
+            s = Console.ReadLine().Split(' ');
+            for (int i = 0; i < n; i++)
+                x[i + 1].varPIPI = int.Parse(s[i]);
 
             //1. feladat
             Console.WriteLine("#");
-            Console.WriteLine(db);
+            Console.WriteLine(x.Count(kk => kk.varKUKU == 0 && kk.varPIPI == 0));
 
             //2. feladat
             Console.WriteLine("#");
-            int KUKUido = K_ind;
-            int PIPIido = P_ind;
-            foreach (var item in menetidoMegallokKozott)
-            {
-                KUKUido += item;
-                PIPIido += item;
-            }
+            int sumK = 0;
+            for (int i = 0; i < x.Count; i++)
+                sumK += x[i].varKUKU + x[i].jobbraIDO;
 
-            foreach (var item in varakozasokKUKU)
-                KUKUido += item;
+            int sumP = 0;
+            for (int i = x.Count-1; i >= 0; i--)
+                sumP += x[i].varPIPI + x[i].balraIDO;
 
-            foreach (var item in varakozasokPIRI)
-                PIPIido += item;
-
-            Console.WriteLine(KUKUido + " " + PIPIido);
+            Console.WriteLine(sumK + " " + sumP);
 
             //3. feladat
             Console.WriteLine("#");
-            List<megallo> x = new List<megallo>();
-            for (int i = 0; i < n; i++)
-                x.Add(new megallo(0, 0));
-
-            for (int i = 0; i < menetidoMegallokKozott.Count-1; i++)
+            (int utolsoMegallo, int lepes) KUKU = (0, 0);
+            (int utolsoMegallo, int lepes) PIPI = (x.Count, 0);
+            int ido = 0;
+            while (true)
             {
-                x[i].idoFromLeft = menetidoMegallokKozott[i];
-                x[i].idoFromRight = menetidoMegallokKozott[i + 1];
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                if (varakozasokKUKU[i] > 0)
-                    x[i].megalleKukutyin = varakozasokKUKU[i];
-                if (varakozasokPIRI[i] > 0)
-                    x[i].megallePiripócs = varakozasokPIRI[i];
-            }
-
-            x.Insert(0, new megallo(0, menetidoMegallokKozott[0], -1, K_ind));
-            x.Insert(x.Count, new megallo(menetidoMegallokKozott[menetidoMegallokKozott.Count-1],0, P_ind, -1));
-            
-            //3. feladat
-            int aktKUKUmeg = 0;
-            int aktPIPImeg = x.Count - 1;
-            int time = 0;
-            int waitTillKukuGoes = 0;
-            int waitTillPipiGoes = x.Count-1;
-
-            int TimeTakenKuku = 0;
-            int TimeTakenPipi = 0;
-            while ((TimeTakenKuku == 0 || TimeTakenPipi == 0) && time < 1000)
-            {
-                ++time;
-
-                //KUKU:
-                if (waitTillPipiGoes == aktPIPImeg)
+                int tempIdo = x[KUKU.utolsoMegallo].varKUKU + x[KUKU.utolsoMegallo].jobbraIDO;
+                var tempKUKU = (KUKU.utolsoMegallo + 1, 0);
+                var tempPIPI = (PIPI.utolsoMegallo, PIPI.lepes);
+                while (tempIdo == 0)
                 {
-                    if (x[aktKUKUmeg].idoFromRight == 0)
+                    if (x[PIPI.utolsoMegallo].varPIPI != 0)
+                        --x[PIPI.utolsoMegallo].varPIPI;
+                    else
                     {
-                        if (!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0)
-                        {
-
-
-                            ++aktKUKUmeg;
-                            waitTillKukuGoes = aktKUKUmeg;
-                        }
+                        if (PIPI.lepes != x[PIPI.utolsoMegallo].balraIDO)
+                            tempPIPI = (tempPIPI.utolsoMegallo, tempPIPI.lepes + 1);
                         else
-                            x[aktKUKUmeg].megalleKukutyin -= 1;
+                            tempPIPI = (tempPIPI.utolsoMegallo - 1, 0);
                     }
-                    else
-                        x[aktKUKUmeg].idoFromRight -= 1;
+                    --tempIdo;
                 }
-                else if (x[aktKUKUmeg].megalleKukutyin.HasValue && x[aktKUKUmeg].megalleKukutyin.Value != 0)
-                    --x[aktKUKUmeg].megalleKukutyin;
-
-                //PIPI:
-                if (waitTillKukuGoes == aktKUKUmeg)
+                if (tempKUKU.Item1 > tempPIPI.utolsoMegallo || (tempKUKU.Item1 == tempPIPI.utolsoMegallo && tempPIPI.lepes > 0)) //Túlment
                 {
-                    if (x[aktPIPImeg].idoFromLeft == 0)
-                    {
-                        if (!x[aktPIPImeg].megallePiripócs.HasValue || x[aktPIPImeg].megallePiripócs.Value == 0)
-                        {
-                            --aktPIPImeg;
-                            waitTillPipiGoes = aktPIPImeg;
-                        }
-                        else
-                            x[aktPIPImeg].megallePiripócs -= 1;
-                    }
-                    else
-                        x[aktPIPImeg].idoFromLeft -= 1;
-                }
-                else if (x[aktPIPImeg].megallePiripócs.HasValue && x[aktPIPImeg].megallePiripócs.Value != 0)
-                    --x[aktPIPImeg].megallePiripócs;
 
-                //ha ugyanazon az úton vannak (pl 0 és 1) megnézzük hogy karambol lenne-e, ha igen a később indulót várakoztatjuk és számoljuk
-                if(waitTillKukuGoes == aktKUKUmeg && waitTillPipiGoes == aktPIPImeg)
-                if (aktPIPImeg - aktKUKUmeg == 1 && ((!x[aktKUKUmeg].megalleKukutyin.HasValue || x[aktKUKUmeg].megalleKukutyin.Value == 0) || (!x[aktPIPImeg].megalleKukutyin.HasValue || x[aktPIPImeg].megalleKukutyin.Value == 0)))
+                }
+                else if (tempKUKU.Item1 < tempPIPI.utolsoMegallo || (tempKUKU.Item1 == tempPIPI.utolsoMegallo && tempPIPI.lepes == 0))//mehet tovább mert egyszerre értek be
                 {
-                    int tempKUKU = x[aktKUKUmeg].megalleKukutyin.HasValue ? x[aktKUKUmeg].megalleKukutyin.Value : 0;
-                    int tempPIPI = x[aktPIPImeg].megallePiripócs.HasValue ? x[aktPIPImeg].megallePiripócs.Value : 0;
 
-                    if (tempKUKU != 0 && tempPIPI == 0)
-                    {
-                        --waitTillPipiGoes;
-                    }
-                    else
-                    {
-                        ++waitTillKukuGoes;
-                    }
                 }
 
-                if (aktKUKUmeg == x.Count - 1)
-                    TimeTakenKuku = time;
-                if (aktPIPImeg == 0)
-                    TimeTakenPipi = time;
+                //meg kell nézni, hogyha megvárjuk a várakozási időt KUKU val akkor elindul e
+                //else if(tempKUKU.Item1 + 1 == tempPIPI.utolsoMegallo && tempKUKU.Item2 == tempPIPI.lepes)//pont egyszerre értek be a megá
+                //ha továbbment mint az első, akkor az elsőnek várakoznia kell, ha pont ugyanott vannak vagy még nem ment túl az elsőn akkor mehet tovább
 
-                Console.WriteLine("time : " + time + " KUKU waiting ? " + (waitTillKukuGoes != aktKUKUmeg ? "Igen" : "Nem") + " PIPI waiting ? " + (waitTillPipiGoes != aktPIPImeg ? "Igen" : "Nem"));
             }
-
-            Console.WriteLine(TimeTakenKuku + " " + TimeTakenPipi);
         }
     }
 }

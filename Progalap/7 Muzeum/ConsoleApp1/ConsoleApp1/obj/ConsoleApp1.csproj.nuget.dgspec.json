@@ -1,6 +1,19 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
+    "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {}
+  },
+  "projects": {
+    "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+        "projectName": "ConsoleApp1",
+        "projectPath": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+        "packagesPath": "C:\\Users\\Sándor Judith\\.nuget\\packages\\",
+        "outputPath": "C:\\IMRE\\Temp\\FunkcionalisProgramozas\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\obj\\",
+=======
     "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {}
   },
   "projects": {
@@ -12,13 +25,18 @@
         "projectPath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
         "packagesPath": "C:\\Users\\UUUHSK\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\7 Muzeum\\ConsoleApp1\\ConsoleApp1\\obj\\",
+>>>>>>> 2ff32b26f0a8fe20e4bd7229edf440004162357a
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
+<<<<<<< HEAD
+          "C:\\Users\\Sándor Judith\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
           "C:\\Users\\UUUHSK\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 2ff32b26f0a8fe20e4bd7229edf440004162357a
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
@@ -60,7 +78,11 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.412\\RuntimeIdentifierGraph.json"
+=======
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.400\\RuntimeIdentifierGraph.json"
+>>>>>>> 2ff32b26f0a8fe20e4bd7229edf440004162357a
         }
       }
     }

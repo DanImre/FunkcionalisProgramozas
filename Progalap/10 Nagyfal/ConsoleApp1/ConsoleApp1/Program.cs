@@ -14,12 +14,64 @@ namespace ConsoleApp1
                 x.Add(int.Parse(Console.ReadLine()));
 
             //1. feladat
-            int orzottCounter = 0;
+            Dictionary<int, string> falszakasz = new Dictionary<int, string>();
             for (int i = 1; i < x.Count; i++)
                 if ((x[i] > 0 && x[i - 1] == 0) || (x[i] == 0 && x[i - 1] > 0))
-                    ++orzottCounter;
+                    falszakasz.Add(i - 1, "orzott");
+                else if (x[i] > 0 && x[i - 1] > 0)
+                    falszakasz.Add(i - 1, "vedett");
+                else
+                    falszakasz.Add(i - 1, "semmi");
 
-            Console.WriteLine(orzottCounter);
+            Console.WriteLine(falszakasz.Count(kk => kk.Value == "orzott" || kk.Value == "vedett" ));
+
+            //2. feladat
+            int db = 0;
+            for (int i = 0; i < falszakasz.Count; i++)
+                if(falszakasz[i] == "semmi")
+                {
+                    ++db;
+                    ++i;
+                }
+
+            Console.WriteLine(db);
+            //3. feladat
+            for (int i = 0; i < falszakasz.Count; i++)
+                if (falszakasz[i] == "semmi")
+                {
+                    Console.WriteLine((i + 1));
+                    break;
+                }
+
+            if (falszakasz.Count(kk => kk.Value == "semmi") == 0)
+                Console.WriteLine(0);
+
+            //4. feladat
+            int? start = null;
+            int? end = null;
+            for (int i = 0; i < falszakasz.Count; i++)
+            {
+                int? tempStart = null;
+                if (falszakasz[i] == "vedett")
+                    tempStart = i;
+
+                while (i < falszakasz.Count && falszakasz[i] == "vedett")
+                    ++i;
+
+                if (tempStart.HasValue)
+                    if (!start.HasValue)
+                    {
+                        start = tempStart;
+                        end = i;
+                    }
+                    else if (end - start < i - tempStart)
+                    {
+                        start = tempStart;
+                        end = i;
+                    }
+            }
+
+            Console.WriteLine((start + 1) + " " + (end + 1));
         }
     }
 }
