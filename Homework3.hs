@@ -35,4 +35,6 @@ doubleAll a = [ n*2 | n <- a]
 
 --ezekszerint ez is kell
 isLonger :: [a] -> [b] -> Bool
-isLonger a b = length a > length b
+isLonger a [] = True
+isLonger [] b = False
+isLonger (a:as) (b:bs) = isLonger as bs
