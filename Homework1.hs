@@ -19,7 +19,7 @@ boolExpr2 :: Bool
 boolExpr3 :: Bool
 boolExpr1 = False
 boolExpr2 = True
-boolExpr3 = False
+boolExpr3 = not True
 
 
 --Virágültetés (bekérés nélkül)
@@ -46,7 +46,7 @@ cmpRem5Rem7 a = (a `mod` 5) > (a `mod` 7)
 
 --Típusszignatúra
 foo :: Int -> Bool -> Bool
-foo a  b = True
+foo a b = True
 bar :: Bool -> Int -> Bool
 bar a b = foo b a
 

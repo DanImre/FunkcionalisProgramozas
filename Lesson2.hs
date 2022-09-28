@@ -93,3 +93,6 @@ tail' :: [a] -> [a]
 tail' (x:xs) = xs
 
 --[1..] generál
+
+singletons :: [[a]] -> [[a]]
+singletons b = [n | [_] <- b]
