@@ -150,7 +150,7 @@ namespace ConsoleApp1
                             if (item.ceg == cegSzam)
                                 continue;
 
-                            if (item.termek == x[i].termek && item.ar <= x[i].ar)
+                            if (item.termek == x[i].termek && item.ar < x[i].ar)//<= helyett
                             {
                                 mindegyikKisebb = false;
                                 break;
