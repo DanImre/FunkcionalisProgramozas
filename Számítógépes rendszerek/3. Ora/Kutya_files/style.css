@@ -1,0 +1,113 @@
+body {
+	background-color: #7f6c18;
+	background-image:url(../gfx/bg1.jpg);
+	background-position:top;
+	background-repeat: repeat-x;
+	
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:0px;
+	margin-right:0px;
+}
+
+
+a,a:visited,a:active {
+	font-size:11.5px;
+	font-family:arial;
+	color:#650015;
+	text-decoration:none;
+}
+a:hover {
+	color:#BD0003;
+}
+
+
+.button,button {
+	border: 0px solid;
+	border-color: #000000;
+	background-color: #650015;
+	height:18px;
+	width: 90px;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight:normal;
+	color: #ffffff;
+	padding:0px;
+}
+
+.button2,button {
+	border: 0px solid;
+	border-color: #000000;
+	background-color: #650015;
+	height:18px;
+	width: 290px;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight:normal;
+	color: #ffffff;
+	padding:0px;
+}
+
+
+.hirfocim {
+color: #7b7553;
+font-family: Arial, Helvetica, sans-serif;
+font-size:12px;
+font-weight:bold;
+text-align:left;
+}
+
+.szoveg3 {
+color: #7b7553;
+font-family: Arial, Helvetica, sans-serif;
+font-size:12px;
+text-align:justify;
+}
+.piros {
+color: #BD0003;
+font-family: Arial, Helvetica, sans-serif;
+font-size:12px;
+font-weight:bold;
+}
+.focim {
+color: #650015;
+font-family: Arial, Helvetica, sans-serif;
+font-size:12px;
+font-weight:bold;
+text-align:center;
+}
+
+.kategoria
+  {
+	font-family: Arial, Verdana, Times, serif;
+	font-weight: bold;
+	font-size: 11pt;
+	color: #7b7553;
+	padding-bottom:10px;
+}
+
+.velemeny {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 8pt;
+	color: #7b7553;
+	text-align: center;
+	padding-top: 30px;
+}
+
+ .idezet
+  {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 13px;
+	text-align: center;
+	color: #603d00;
+}
+
+ .idezet2
+  {
+	font-family: Arial, Verdana, Times, serif;
+	font-size: 11.5px;
+	text-align: justify;
+	color: #2F4F4F;
+}
+
+
