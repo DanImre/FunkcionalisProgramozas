@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<time.h>
 #include<stdlib.h>
+#include<math.c>
 
 int beker();
 int check(int bekert, int i);

@@ -8,25 +8,25 @@
     "net5.0": []
   },
   "packageFolders": {
-    "C:\\Users\\UUUHSK\\.nuget\\packages\\": {},
+    "C:\\Users\\uuuhsk\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\uuuhsk\\Desktop\\Git\\FunkcionalisProgramozas\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
       "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-      "packagesPath": "C:\\Users\\UUUHSK\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\obj\\",
+      "projectPath": "C:\\Users\\uuuhsk\\Desktop\\Git\\FunkcionalisProgramozas\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+      "packagesPath": "C:\\Users\\uuuhsk\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\uuuhsk\\Desktop\\Git\\FunkcionalisProgramozas\\Progalap\\MasodikOra\\ConsoleApp1\\ConsoleApp1\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\UUUHSK\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\uuuhsk\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
