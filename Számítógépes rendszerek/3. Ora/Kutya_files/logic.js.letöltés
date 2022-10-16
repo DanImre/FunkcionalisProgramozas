@@ -1,0 +1,69 @@
+ container = document.getElementById("main-container");
+
+var tl = new TimelineMax();
+// var loop = 0;
+// var loopMax = 1;
+// Called on the window load event.
+ 
+ 
+window.addEventListener("load", function () {
+	init();
+});
+
+function init() {
+	container.style.visibility = "visible";
+	show();
+}
+ 
+//Adjust values below for each size
+//Background image adjustments
+
+bgFinalHeight = 58,
+bgInitialX = -150,
+bgFinalX = 44,
+bgFinalY = 110,
+
+blackBGXFinal = 0,
+blackBGYFinal = -108,
+
+text1X = 212,
+text2X = 264,
+text3X = 218,
+text4X = 223,
+
+ctaWidth = 131;
+
+//End of adjustments
+
+TimelineLite.prototype.wait = function(position) {
+	return this.set({}, {}, position);
+  };
+
+// Shows the ad.
+function show() {
+	tl.addLabel('frame1', '+=0')
+        .to([txt1], 0.5, { x: `${text1X}`, autoAlpha: 1, ease:Power1.easeOut}, 'frame1+=0.5')
+        .to([txt1], 0.5, { autoAlpha: 0 }, 'frame1+=3')
+        
+        .to([background], 0.5, { autoAlpha: 0}, 'frame1+=3.5')
+        .to([txt2], 0.5, { x: `${text2X}`, autoAlpha: 1,ease:Power1.easeOut}, 'frame1+=3.5')
+        .to([txt2], 0.5, { autoAlpha: 0 }, 'frame1+=7')
+
+	    .to([background2], 0.5, { autoAlpha: 0}, 'frame1+=7.5')
+        .to([txt3], 0.5, { x: `${text3X}`, autoAlpha: 1,ease:Power1.easeOut}, 'frame1+=7.5')
+        .to([txt3], 0.5, { autoAlpha: 0 }, 'frame1+=11')
+	
+        .to([blackMask], 0.5, { x: `${blackBGXFinal}px`, y: `${blackBGYFinal}px`, autoAlpha: 1,ease: Linear.easeNone}, 'frame1+=11.5')
+        .to([starpartslogo], 0.5, {autoAlpha: 1 }, 'frame1+=11.7')
+        .to([txt4], 0.5, { x:`${text4X}`, ease:Power1.easeOut }, 'frame1+=12')
+
+        .to([cta], 0.4, { width: `${ctaWidth}px`, autoAlpha: 1 }, 'frame1+=13')
+        .to([ctaImg], 0.5, { marginLeft: 0, autoAlpha: 1 }, 'frame1+=13.4')
+        .to([shain], 0.6, { left: 0, autoAlpha: .6 }, 'frame1+=13.9')
+        .to([shain], 0.4, { autoAlpha: 0 }, 'frame1+=14.3')
+}
+
+// Exit Hnadlers
+
+ 
+ 
