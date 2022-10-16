@@ -8,6 +8,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            Console.ReadKey();
             int n = int.Parse(Console.ReadLine());
             List<(int, int)> x = new List<(int, int)>();
             for (int i = 0; i < n; i++)
