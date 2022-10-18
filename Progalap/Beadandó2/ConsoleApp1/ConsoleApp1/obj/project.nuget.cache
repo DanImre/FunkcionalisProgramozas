@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pvrQzM/aFZZ7S3VUgVAbgg6pWIckCJeYoD5g6Qibm9gBPJAGYWLCqPTD9W/3tXDarmlrIoZX3eKfCelwiP73og==",
+  "dgSpecHash": "eTxl0Kw6eTp6D39k2KCCarapy9R8XKLkaxCmWqxLvjvw0+B5s9SD4Nlpoa1vfy+EP6saBIy1BGwkEmlDbb+NAg==",
   "success": true,
-  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\Beadandó2\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Progalap\\Beadandó2\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
