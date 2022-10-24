@@ -95,4 +95,14 @@ tail' (x:xs) = xs
 --[1..] generál
 
 singletons :: [[a]] -> [[a]]
-singletons b = [n | [_] <- b]
+singletons b = [n | n <- b, null n]
+
+--ottghon
+ureshalmazokszama :: [[a]] -> Int
+ureshalmazokszama b = length [n | n <- b, null n]
+
+hasEmpty :: [[a]] -> Bool
+hasEmpty (a:as) = null a || hasEmpty as
+
+hasZero :: [Int] -> Bool
+hasZero (a:as) = a == 0 || hasZero as
