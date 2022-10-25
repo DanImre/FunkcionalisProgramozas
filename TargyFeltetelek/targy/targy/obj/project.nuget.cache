@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5r5IIqt7NF2hWZp0veBQSPUyesVyxBdVF/SdEZtjsJocSWEyYdonhSkxtCq6GA+rp0ftXXhaUoKo1AyYbpmSuw==",
+  "dgSpecHash": "faUtjM81Rd/2HA4rk9G7JQsfIqjd4Yt7v0UdEIujd/jVzZGtqcYYwdLdbp9+282Y99CY1UZSv2NKeFtleNGF1A==",
   "success": true,
-  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\TargyFeltetelek\\targy\\targy\\targy.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\TargyFeltetelek\\targy\\targy\\targy.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
