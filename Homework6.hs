@@ -20,11 +20,11 @@ mightyGale ((a, b, c, d):xs)
 cipher :: String -> String
 cipher (a:b:c:xs)
     | ((not (isDigit a)) && (not (isDigit b)) && (isDigit c)) = [a,b]
-    | otherwise = cipher [b,c] ++ xs
+    | otherwise = cipher ([b,c] ++ xs)
 cipher _ = ""
 
 pizza :: [(String, Int)] -> Int
-pizza [] = 0
+pizza [] = 500
 pizza ((a,b):xs) = b + pizza xs
 
 contains :: Eq a => a -> [a] -> Bool
