@@ -4,8 +4,6 @@ n=1;
 declare -a nevekArray
 declare -a besorolasokArray
 declare -a munkakorokArray # itt '-'-ekkel elvalasztva lesznek
-declare -a sorhosszak #literalisan a sorok hossza
-sorhosszak[0]=0
 while read line; 
 do
     IFS=',' read -r -a array <<< "$line" #beolvassa az array-be
@@ -49,7 +47,7 @@ do
     fi
 done
 
-if [ $n == "0" ]
+if [ "$n" == "0" ]
 then
     echo "NINCS"
 fi
