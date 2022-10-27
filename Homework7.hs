@@ -32,9 +32,13 @@ countChars (x:xs) = length ( x ) + countChars xs
 
 capitalizeWord :: String -> String
 capitalizeWord (x:xs) = toUpper(x):xs
+capitalizeWord _ = []
 
 capitalizeWordsInLine :: Line -> Line
-capitalizeWordsInLine (x:xs) = unwords (words (toUpper(x):xs))
+capitalizeWordsInLine x = unwords ( nagybetusites (words (x))) where
+    nagybetusites :: [String] -> [String]
+    nagybetusites ((y:ys):zs) = (toUpper(y):ys) : nagybetusites zs
+    nagybetusites _ = []
 
 isComment :: Line -> Bool
 isComment x = ( (take 2 x) == "--")
@@ -79,4 +83,8 @@ replaceTab x y
     | otherwise = [y]
 
 replaceTabs :: Int -> File -> File
-replaceTabs n (x:xs) = ((replaceTabs n) (concat x)) : ((replaceTabs n) xs)
+replaceTabs _ [] = []
+replaceTabs n (x:xs) = sorbejaras x : replaceTabs n xs where
+    sorbejaras :: Line -> Line
+    sorbejaras (y:ys) = (replaceTab n y) ++ sorbejaras ys
+    sorbejaras _ = []
