@@ -14,11 +14,6 @@ testFileEmpty = []
 type Line = String
 type File = [Line]
 
---magamnak
-testLine :: Line
-testLine = "hello"
---
-
 countWordsInLine :: Line -> Int
 countWordsInLine x = length (words (x))
 
@@ -41,30 +36,12 @@ isComment x = ( (take 2 x) == "--")
 dropComments :: File -> File
 dropComments x = [n | n <- x , not (isComment n)]
 
-intToString :: Int -> String
-intToString x 
-    | x == 0 = ['0']
-    | x == 1 = ['1']
-    | x == 2 = ['2']
-    | x == 3 = ['3']
-    | x == 4 = ['4']
-    | x == 5 = ['5']
-    | x == 6 = ['6']
-    | x == 7 = ['7']
-    | x == 8 = ['8']
-    | x == 9 = ['9']
-    | x > 9 = (intToString (x `div` 10)  ++ intToString (mod x 10 ) )
-
 numberLines :: File -> File
 numberLines x = [ show n ++ ": " ++ s | (n,s) <- (zip [1..length(x)] x)]
 
 dropTrailingWhitespaces :: Line -> Line
-dropTrailingWhitespaces x = reverse(trimBack (reverse x)) where
-    trimBack :: Line -> Line
-    trimBack (x:xs)
-        | (isSpace(x)) = trimBack xs
-        | otherwise = x:xs
-    trimBack _ = []
+dropTrailingWhitespaces [] = []
+dropTrailingWhitespaces x = reverse (dropWhile isSpace (reverse x))
 
 replaceTab :: Int -> Char -> [Char]
 replaceTab x y
@@ -72,8 +49,4 @@ replaceTab x y
     | otherwise = [y]
 
 replaceTabs :: Int -> File -> File
-replaceTabs _ [] = []
-replaceTabs n (x:xs) = sorbejaras x : replaceTabs n xs where
-    sorbejaras :: Line -> Line
-    sorbejaras (y:ys) = (replaceTab n y) ++ sorbejaras ys
-    sorbejaras _ = []
+replaceTabs n x = map (concatMap (replaceTab n)) x
