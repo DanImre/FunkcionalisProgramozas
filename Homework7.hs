@@ -23,31 +23,23 @@ countWordsInLine :: Line -> Int
 countWordsInLine x = length (words (x))
 
 countWords :: File -> Int
-countWords [] = 0
-countWords (x:xs) = length ( words (x)) + countWords xs
+countWords x = sum (map countWordsInLine x)
 
 countChars :: File -> Int
-countChars [] = 0
-countChars (x:xs) = length ( x ) + countChars xs
+countChars x = sum (map length x)
 
 capitalizeWord :: String -> String
 capitalizeWord (x:xs) = toUpper(x):xs
 capitalizeWord _ = []
 
 capitalizeWordsInLine :: Line -> Line
-capitalizeWordsInLine x = unwords ( nagybetusites (words (x))) where
-    nagybetusites :: [String] -> [String]
-    nagybetusites ((y:ys):zs) = (toUpper(y):ys) : nagybetusites zs
-    nagybetusites _ = []
+capitalizeWordsInLine x = unwords ( map capitalizeWord (words x))
 
 isComment :: Line -> Bool
 isComment x = ( (take 2 x) == "--")
 
 dropComments :: File -> File
-dropComments (x:xs)
-    | (isComment x) = dropComments xs
-    | otherwise = x : dropComments xs
-dropComments _ = []
+dropComments x = [n | n <- x , not (isComment n)]
 
 intToString :: Int -> String
 intToString x 
@@ -64,10 +56,7 @@ intToString x
     | x > 9 = (intToString (x `div` 10)  ++ intToString (mod x 10 ) )
 
 numberLines :: File -> File
-numberLines x = numberLinesSeged (zip [1..length(x)]x) where
-    numberLinesSeged :: [(Int,Line)] -> File
-    numberLinesSeged ((x,xs):ys) = (intToString(x) ++ ": " ++ xs) : numberLinesSeged ys
-    numberLinesSeged _ = []
+numberLines x = [ show n ++ ": " ++ s | (n,s) <- (zip [1..length(x)] x)]
 
 dropTrailingWhitespaces :: Line -> Line
 dropTrailingWhitespaces x = reverse(trimBack (reverse x)) where
