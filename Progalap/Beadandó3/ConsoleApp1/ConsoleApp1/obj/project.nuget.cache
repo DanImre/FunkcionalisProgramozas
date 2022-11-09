@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "+x9v5H6HE6li/XCjlqAy/G9MV8LtIuityZqaHnA4ayRDt2QESFgivkNjrQXW4gEDWXj1zLgdDYIs1x48+NIK4w==",
+  "success": true,
+  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\Beadandó3\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
+  ],
+  "logs": []
+}
