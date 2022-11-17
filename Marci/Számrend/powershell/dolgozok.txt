@@ -1,0 +1,11 @@
+Gipsz Jakab,Pultos,ejszakas,4 oras ugyelet 
+Csupa Ful,Mesterszakacs,menu tervezes,konyha iranyitas,fozes,sutes
+Lacika,Pultos,ugyelet,szorakoztato
+Operativ Torzs,Legfobb vezeto,mindenes,szervezo,lebonyolito,beast
+Mike Oxlong,szobaszerviz
+Lakatos Buszmegallo,Biztonsagi or,oriz,ved,vigyaz,ov
+Ica neni,Tanar,dog,tanit
+Horvath Nathan,Orvos,doktor,portas
+Horvath Reka,Beast,telefon,taska,SUIII
+Kolompar Heimdal,Futar,hoz,visz,szallit,lerak,kitesz,eldob
+De:Nash,Rapper,hazafi,taltos,szittya magyar,politikus
