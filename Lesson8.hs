@@ -1,4 +1,4 @@
-module Lesson7 where
+module Lesson8 where
 import Data.List
 import Data.Char
 
