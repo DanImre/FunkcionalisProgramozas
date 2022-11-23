@@ -1,0 +1,14 @@
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.exe
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.deps.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.runtimeconfig.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.runtimeconfig.dev.json
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\bin\Debug\netcoreapp3.1\Zh.pdb
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.csproj.AssemblyReference.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.AssemblyInfoInputs.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.AssemblyInfo.cs
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.csproj.CoreCompileInputs.cache
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.dll
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.pdb
+C:\Users\UUUHSK\Desktop\Funkcionális Programozás\Progalap\ProgramozósZh\Zh\Zh\obj\Debug\netcoreapp3.1\Zh.genruntimeconfig.cache
