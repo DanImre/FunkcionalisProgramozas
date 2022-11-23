@@ -79,7 +79,7 @@ void stdnt_info(Student *x, Type t) //kiirja a hallgatók infoit
     }
 }
 
-Student *MaxAvg(Student *x[])
+Student *MaxAvg(Student *x[]) // visszaadja a legjobb átlakú tanulót
 {
     int max=0;
     for (int i = 1; i < n; i++)
@@ -92,23 +92,23 @@ Student *MaxAvg(Student *x[])
 int main()
 {
     srand(time(NULL));
-    Student *hallgatok[n];
-    Type t[n];
+    Student *hallgatok[n]; //hallgatók tömbje
+    Type t[n]; //hallgatók típusainak tömbje
     for (int i = 0; i < n; i++)
     {
-        t[i]=i%3;
+        t[i]=i%3; //0-2 közt ad vissza számot, az enum miatt azokból Bsc, Msc vagy PhD lesz
         hallgatok[i] = student_init(t[i], i + 1);
     }
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) //kiirja az összes hallgató adatát, igazából csak teszt volt
     {
         stdnt_info(hallgatok[i],t[i]);
     }
     int maxid = (MaxAvg(hallgatok)->id)-1;
     printf("Studrnt with highest AVG:\n");
     stdnt_info(hallgatok[maxid],t[maxid]);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) //minden hallgatót freeelünk
     {
-        if(t[i]==PhD) free(hallgatok[i]->x.impfakt);
+        if(t[i]==PhD) free(hallgatok[i]->x.impfakt); //a PhD-s hallgatók extra mezőjét is kell freeelni
         free(hallgatok[i]);
     }
     return 0;
