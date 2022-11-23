@@ -6,17 +6,27 @@
 const int szamdb=100; //ennyi szamot generálunk
 int n;
 
-int elemszam(char filenev[])
+int beolvas(char *filenev, char *x[n])
 {
     FILE *fp; //filepointer, egyertelműen a filera mutat
     fp = fopen(filenev, "r"); // filenyitás
-    char buff[255];
+    char buff[20];
     int db=0;
-    while (fgets(buff, 255, fp) != NULL) //addig megy amíg a sorban van adat
+    int i = 0;
+    while (fgets(buff, 20, fp) != NULL) //addig megy amíg a sorban van adat
     {
         db++;
     }
     fclose(fp); //zárás
+    fp = fopen(filenev, "r");
+    for (int i = 0; i < db; i++)
+    {
+        x[i] = malloc(20);
+        fgets(x[i], 20, fp);
+        printf("%s",x[i]);
+    }
+    fclose(fp);
+    printf("----------\nbeolvastal\n----------\n");
     return db;
 }
 
@@ -25,7 +35,8 @@ void longerthan(char *x[n], int hossz)
     printf("Az %d-nel hosszabb szavak:\n",hossz);
     for (int i = 0; i < n; i++)
     {
-        if(strlen(x[i])>hossz+1) printf("%s",x[i]); //ott a végén a \n karakter
+        printf("benn\n");
+        printf("%s",x[i]);
     }
 }
 
@@ -92,25 +103,27 @@ void nullaz(char filenev[]) // igazából felülírja az előző filet
     fclose(fp);
 }
 
-void parosok(int szamok[])
+int parosok(int szamok[])
 {
     srand(time(NULL));
     printf("Hozzafuzzuk az elozo filehoz? (I/N): ");
     char valasz;
     scanf("%c", &valasz);
     if(valasz == 'N') nullaz("even_numbers.txt");
+    int db = 0;
     for (int i = 0; i < szamdb; i++)
     {
         szamok[i]=rand() % 100;
         if(szamok[i]%2 == 0 && szamok[i] != 0) intkiir("even_numbers.txt",szamok[i]);
+        db++;
     }
 }
 
-int parosSum(char file[])
+int parosSum(char file[], int db)
 {
     FILE *fp=fopen(file, "r");
     int s=0;
-    for (int i = 0; i < elemszam(file); i++)
+    for (int i = 0; i < db; i++)
     {
         int x = 0;
         fscanf(fp, "%d", &x);
@@ -147,16 +160,9 @@ void LIWE ()
 
 int main(int argc, char *argv[])
 {
-    char nev[] = {"ora6.txt"};
-    FILE *fp = fopen(nev, "r");
-    n = elemszam(nev);
+    char *nev = "ora6.txt";
     char *szavak[n];
-    for (int i = 0; i < n; i++)
-    {
-        fgets(szavak[i], 255, fp);
-    }
-    fclose(fp);
-    printf("----------\nbeolvastal\n----------\n");
+    n = beolvas(nev,szavak);
     longerthan(szavak,5);
     hasChar(szavak,'x');
     contains(szavak,"ci");
@@ -166,8 +172,12 @@ int main(int argc, char *argv[])
     printf("%d faktorialis: %d\n",10,fact(10));
     kiir("player.txt","Papp Márton");
     int szamok[szamdb];
-    parosok(szamok);
-    printf("Az even_numbers.txt-ben a szamok osszege: %d\n",parosSum(argv[3]));
+    int parosdb = parosok(szamok);
+    printf("Az even_numbers.txt-ben a szamok osszege: %d\n",parosSum(argv[3],parosdb));
     LIWE();
+    for (int i = 0; i < n; i++)
+    {
+        free(szavak[i]);
+    }
     return 0;
 }
