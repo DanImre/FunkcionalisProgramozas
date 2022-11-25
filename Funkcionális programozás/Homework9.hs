@@ -73,12 +73,28 @@ updateEntry u (entryU, (Entry entryP entryPrivi entryFriends))
     | (u == entryU) = Nothing
     | otherwise = Just (entryU, Entry entryP entryPrivi [ n | n <- entryFriends, n /= u])
 
-{-
-deleteUser :: Cookie -> Username -> Database -> Database
-deleteUser (LoggedIn _ Admin) u l = [ n | n <- l, isJust(updateEntry u n)]
-deleteUser _ _ l = l
--}
-
 deleteUser :: Cookie -> Username -> Database -> Database
 deleteUser (LoggedIn _ Admin) u l = [ fromJust n | n <- (map (updateEntry u) l), isJust(n)]
 deleteUser _ _ l = l
+
+--Homework10
+
+getFriends :: Username -> Database -> [Username]
+getFriends u d
+    | (isJust (lookup u d) == False) = []
+    | otherwise = getFriendsFromEntry (fromJust(lookup u d)) where
+        getFriendsFromEntry :: Entry -> [Username]
+        getFriendsFromEntry (Entry _ _ x) = x
+
+getFriendsRefl :: Username -> Database -> [Username]
+getFriendsRefl u d
+    | ((getFriends u d) == []) = []
+    | otherwise = u : (getFriends u d)
+
+fixPoint :: Eq a => (a -> a) -> a -> a
+fixPoint f x
+    | ((f x) == (f (f x))) = f x
+    | otherwise = fixPoint f (f x)
+
+sortUnique :: (Eq a, Ord a) => [a] -> [a]
+sortUnique x = map head (group (sort x))
