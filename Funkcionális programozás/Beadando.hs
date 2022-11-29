@@ -59,12 +59,57 @@ placeZombieInLane (GameModel sun plantMap zombieMap) zombie sav
     | otherwise = Nothing
 
 --csökkenti a növény életét
-performZombieActionsSeged :: [(Coordinate, Plant)] -> Coordinate -> [(Coordinate, Plant)]
+performZombieActionsSeged :: [(Coordinate, Plant)] -> [(Coordinate, Zombie)] -> [(Coordinate, Plant)]
+performZombieActionsSeged (((xP,yP), Peashooter x) : xs) zombieMap
+    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Peashooter x) : performZombieActionsSeged xs zombieMap
+    | otherwise = ((xP,yP), (Peashooter (x - 1))) : performZombieActionsSeged xs zombieMap
+performZombieActionsSeged (((xP,yP), Sunflower x) : xs) zombieMap
+    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Sunflower x) : performZombieActionsSeged xs zombieMap
+    | otherwise = ((xP,yP), (Sunflower (x - 1))) : performZombieActionsSeged xs zombieMap
+performZombieActionsSeged (((xP,yP), Walnut x) : xs) zombieMap
+    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Walnut x) : performZombieActionsSeged xs zombieMap
+    | otherwise = ((xP,yP), (Walnut (x - 1))) : performZombieActionsSeged xs zombieMap
+performZombieActionsSeged (((xP,yP), CherryBomb x) : xs) zombieMap
+    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), CherryBomb x) : performZombieActionsSeged xs zombieMap
+    | otherwise = ((xP,yP), (CherryBomb (x - 1))) : performZombieActionsSeged xs zombieMap
+performZombieActionsSeged [] _ = []
 
 performZombieActions :: GameModel -> Maybe GameModel
-performZombieActions (GameModel sun plantMap (((x,y),zombie):zombieMap))
-    belsoseged :: 
-    | (y == 0) = Nothing
-    | (lookup (x,y) plantMap == Nothing) = 
+performZombieActions (GameModel sun plantMap zombieMap)
+    | (length (filter (\((xB,yB), zombieB) -> yB <= 0) zombieMap) > 0) = Nothing
+    | otherwise = Just (GameModel sun (performZombieActionsSeged plantMap (belsoseged zombieMap)) (belsoseged zombieMap)) where
+        belsoseged :: [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+        belsoseged (((xC,yC), Vaulting z 2) : xs)
+            | (lookup (xC,yC) plantMap == Nothing && yC == 1) = ((xC,yC - 1), Vaulting z 2) : belsoseged xs
+            | (lookup (xC,yC) plantMap == Nothing) = ((xC,yC - 2), Vaulting z 2) : belsoseged xs
+            | (yC == 1) = ((xC,yC - 1), Vaulting z 1) : belsoseged xs
+            | otherwise = ((xC,yC - 2), Vaulting z 1) : belsoseged xs
+        belsoseged (((xC,yC), (Basic z x)) : xs)
+            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Basic z x)) : belsoseged xs
+            | otherwise = ((xC,yC), (Basic z x)) : belsoseged xs
+        belsoseged (((xC,yC), (Conehead z x)) : xs)
+            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Conehead z x)) : belsoseged xs
+            | otherwise = ((xC,yC), (Conehead z x)) : belsoseged xs
+        belsoseged (((xC,yC), (Buckethead z x)) : xs)
+            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Buckethead z x)) : belsoseged xs
+            | otherwise = ((xC,yC), (Buckethead z x)) : belsoseged xs
+        belsoseged [] = []
 
- -- = (GameModel sun plantMap (map performZombieActionsSeged zombieMap))
+cleanBoard :: GameModel -> GameModel
+cleanBoard (GameModel sun plantMap zombieMap) = (GameModel sun (plantCleaner plantMap) (zombieCleaner zombieMap)) where
+    plantCleaner :: [(Coordinate, Plant)] -> [(Coordinate, Plant)]
+    plantCleaner (((x,y), Peashooter 0) : xs) = plantCleaner xs
+    plantCleaner (((x,y), Sunflower 0) : xs) = plantCleaner xs
+    plantCleaner (((x,y), Walnut 0) : xs) = plantCleaner xs
+    plantCleaner (((x,y), CherryBomb 0) : xs) = plantCleaner xs
+    plantCleaner (x:xs) = x : plantCleaner xs
+    plantCleaner [] = []
+    zombieCleaner :: [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+    zombieCleaner (((x,y), Basic 0 _) : xs) = zombieCleaner xs
+    zombieCleaner (((x,y), Conehead 0 _) : xs) = zombieCleaner xs
+    zombieCleaner (((x,y), Buckethead 0 _) : xs) = zombieCleaner xs
+    zombieCleaner (((x,y), Vaulting 0 _) : xs) = zombieCleaner xs
+    zombieCleaner (x:xs) = x : zombieCleaner xs
+    zombieCleaner [] = []
+
+--Opcionális rész
