@@ -54,10 +54,10 @@ void titkosit(char bemenet[], char kimenet[]) {
     int hossz=i;
     int u=hossz-spacek;
   //  printf("%d\n", hossz);
-    char forditottSzavakSpaceel[u];
+    char forditottSzavakSpaceel[10];
     //printf("actual size : %d\n", sizeof(forditottSzavakSpaceel)/sizeof(char));
     int forditottSzavakSpaceelIndex = 0;
-    char szavakbetuinekszama[db];
+    char szavakbetuinekszama[10];
     i=0;
     int j=0;
     int z=0;
