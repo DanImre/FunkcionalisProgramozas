@@ -113,3 +113,78 @@ cleanBoard (GameModel sun plantMap zombieMap) = (GameModel sun (plantCleaner pla
     zombieCleaner [] = []
 
 --Opcionális rész
+
+isSunflower :: Plant -> Bool
+isSunflower (Sunflower _) = True
+isSunflower _ = False
+
+lowerHealth :: Zombie -> Zombie
+lowerHealth (Basic x y) = Basic (x-1) y
+lowerHealth (Conehead x y) = Conehead (x-1) y
+lowerHealth (Buckethead x y) = Buckethead (x-1) y
+lowerHealth (Vaulting x y) = Vaulting (x-1) y
+
+killZombie :: Zombie -> Zombie
+killZombie (Basic x y) = Basic 0 y
+killZombie (Conehead x y) = Conehead 0 y
+killZombie (Buckethead x y) = Buckethead 0 y
+killZombie (Vaulting x y) = Vaulting 0 y
+
+plantMapCherryBombs :: [(Coordinate, Plant)] -> [(Coordinate, Plant)]
+plantMapCherryBombs ((cord, CherryBomb x) : xs) = (cord, CherryBomb 0) : plantMapCherryBombs xs
+plantMapCherryBombs (x:xs) = x : plantMapCherryBombs xs
+plantMapCherryBombs [] = []
+
+
+
+--(sortBy (\((xF,yF), zombie) -> xF) (filter (\((xF,yF), zombie) -> xF == x) zombieMap))
+
+zombieMapAlakitas :: [(Coordinate, Plant)] -> [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+zombieMapAlakitas (((x,y), Peashooter z) : xs) zombieMap
+    | ((coordinateOfTheFirstZombieInTheRow (filter (\((xZ,yZ), zombie) -> yZ >= y) zombieMap) x) < 13) = zombieMapAlakitas xs (damageZombieAtCords (x, (coordinateOfTheFirstZombieInTheRow (filter (\((xZ,yZ), zombie) -> yZ >= y) zombieMap) x)) zombieMap)
+    | otherwise = zombieMapAlakitas xs zombieMap
+zombieMapAlakitas (((x,y), CherryBomb z) : xs) zombieMap = (killZombieAtCords (x + 1,y + 1) (killZombieAtCords (x - 1,y + 1) (killZombieAtCords (x + 1,y - 1) (killZombieAtCords (x - 1,y - 1) (killZombieAtCords (x ,y + 1) (killZombieAtCords (x ,y - 1) (killZombieAtCords (x + 1,y) (killZombieAtCords (x - 1 ,y) (killZombieAtCords (x,y) zombieMap)))))))))
+zombieMapAlakitas _ z = z
+
+coordinateOfTheFirstZombieInTheRow :: [(Coordinate, Zombie)] -> Int -> Int
+coordinateOfTheFirstZombieInTheRow (((x,y), zombie) : xs) row
+    | (x == row && y <= (coordinateOfTheFirstZombieInTheRow xs row)) = y
+    | otherwise = coordinateOfTheFirstZombieInTheRow xs row
+coordinateOfTheFirstZombieInTheRow [] _ = 13
+
+damageZombieAtCords :: Coordinate -> [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+damageZombieAtCords (x,y) (((xZ,yZ), zombie) : xs)
+    | (x == xZ && y == yZ) = ((xZ,yZ), (lowerHealth zombie)) : xs
+    | otherwise = ((xZ,yZ), zombie) : damageZombieAtCords (x,y) xs
+damageZombieAtCords _ [] = []
+
+killZombieAtCords :: Coordinate -> [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+killZombieAtCords (x,y) (((xZ,yZ), zombie) : xs)
+    | (x == xZ && y == yZ) = ((xZ,yZ), (killZombie zombie)) : xs
+    | otherwise = ((xZ,yZ), zombie) : killZombieAtCords (x,y) xs
+killZombieAtCords _ [] = []
+
+performPlantActions :: GameModel -> GameModel
+performPlantActions (GameModel sun plantMap zombieMap) = (GameModel (sun + length (filter (\((x,y), plant) -> isSunflower plant) plantMap) * 25) (plantMapCherryBombs plantMap) (zombieMapAlakitas plantMap zombieMap))
+
+fromMaybe :: Maybe a -> a
+fromMaybe (Just x) = x
+fromMaybe _ = error "Nothing volt"
+
+--createNormalZombieMap :: [[(Int, Zombie)]] -> [(Coordinate, Zombie)]
+--map (\(x, zombie) -> ((x,11), zombie)) z
+
+defendsAgainstSeged :: GameModel -> [[(Int, Zombie)]] -> Int -> Bool
+defendsAgainstSeged (GameModel sun plantMap zombieMap) (z : zs) kor
+    | (kor == 1) = defendsAgainstSeged (GameModel sun plantMap zombieMap) (z:zs) (kor + 1)
+    | (kor == 2) = defendsAgainstSeged (performPlantActions (GameModel sun plantMap zombieMap)) (z:zs) (kor + 1)
+    | (kor == 3) = defendsAgainstSeged (cleanBoard (GameModel sun plantMap zombieMap)) (z:zs) (kor + 1)
+    | (kor == 4 && (performZombieActions (GameModel sun plantMap zombieMap)) == Nothing) = False
+    | (kor == 4) = defendsAgainstSeged (fromMaybe (performZombieActions (GameModel sun plantMap zombieMap))) (z:zs) (kor + 1)
+    | (kor == 5) = defendsAgainstSeged (GameModel sun plantMap (zombieMap ++ (map (\(x, zombie) -> ((x,11), zombie)) z))) zs (kor + 1)
+    | (kor == 6) = defendsAgainstSeged (cleanBoard (GameModel sun plantMap zombieMap)) (z:zs) (kor + 1)
+    | (kor == 7) = defendsAgainstSeged (GameModel (sun + 25) plantMap zombieMap) (z:zs) 1
+defendsAgainstSeged _ [] _ = True
+
+defendsAgainst :: GameModel -> [[(Int, Zombie)]] -> Bool
+defendsAgainst (GameModel s p zM) z = defendsAgainstSeged (GameModel s p zM) z 1
