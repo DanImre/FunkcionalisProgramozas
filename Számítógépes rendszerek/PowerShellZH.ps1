@@ -1,3 +1,5 @@
+#1. feladat
+
 $szam = 10
 $tipp = Read-Host "Tippelj! "
 while($szam -ne $tipp)
