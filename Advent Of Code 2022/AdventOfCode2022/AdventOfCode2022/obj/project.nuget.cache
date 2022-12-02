@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "LlaREMkMH8RSIXIeaQoYp7WPYnIWR7Vw9LL+o91s77t35SRqLpDmt70d/kPX/xkXQ5NYihjyRWt+lhQKW+WmDg==",
+  "dgSpecHash": "otHWjAVAQ8DBRq4m4Kd81YfjJHQRxozGwYmB4Vo056SF/GjcpJbta1zqQwbv71vnwBRREz/LINx+sT3LebU1iw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\UUUHSK\\Desktop\\Funkcionális Programozás\\Advent Of Code 2022\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Advent Of Code 2022\\AdventOfCode2022\\AdventOfCode2022\\AdventOfCode2022.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
+  ],
   "logs": []
 }
