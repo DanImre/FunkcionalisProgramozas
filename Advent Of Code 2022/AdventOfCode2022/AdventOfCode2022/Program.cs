@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace AdventOfCode2022
 {
@@ -77,6 +78,41 @@ namespace AdventOfCode2022
             Console.WriteLine("Total score with the top secret strategy: " + sum);
         }
 
+        public static void Harmadik()
+        {
+            string[] s = File.ReadAllLines("harmadik.txt");
+
+            int sum = 0;
+
+            foreach (var item in s)
+            {
+                string firstCompartment = item.Substring(0, item.Length / 2);
+                string secondCompartment = item.Substring(item.Length / 2);
+
+                //We now there is exactly 1 duplicate
+                //converting the char to it's ASCII value
+                int duplicate = firstCompartment.Where(kk => secondCompartment.Contains(kk)).First();
+
+                sum += duplicate < 91 ? duplicate - 38 : duplicate - 96;
+            }
+
+            Console.WriteLine("Sum of the priorities: " + sum);
+
+            //2. rész
+            int index = 0;
+            sum = 0;
+
+            while (index < s.Length)
+            {
+                int badge = s[index].Where(kk => s[index + 1].Contains(kk) && s[index + 2].Contains(kk)).First();
+                sum += badge < 91 ? badge - 38 : badge - 96;
+
+                index += 3;
+            }
+
+            Console.WriteLine("Sum of the priorities of badges: " + sum);
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Melyik feladat: ");
@@ -88,6 +124,9 @@ namespace AdventOfCode2022
                     break;
                 case 2:
                     Masodik();
+                    break;
+                case 3:
+                    Harmadik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
