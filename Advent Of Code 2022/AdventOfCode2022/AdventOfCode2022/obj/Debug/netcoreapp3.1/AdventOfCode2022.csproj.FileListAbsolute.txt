@@ -26,3 +26,17 @@ E:\----IMI----\Egyetem\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2
 E:\----IMI----\Egyetem\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.dll
 E:\----IMI----\Egyetem\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.pdb
 E:\----IMI----\Egyetem\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.genruntimeconfig.cache
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.exe
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.deps.json
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.runtimeconfig.json
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.runtimeconfig.dev.json
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.dll
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\bin\Debug\netcoreapp3.1\AdventOfCode2022.pdb
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.csproj.AssemblyReference.cache
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.AssemblyInfoInputs.cache
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.AssemblyInfo.cs
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.csproj.CoreCompileInputs.cache
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.dll
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.pdb
+C:\Users\19dar\Desktop\Git repos\FunkcionalisProgramozas\Advent Of Code 2022\AdventOfCode2022\AdventOfCode2022\obj\Debug\netcoreapp3.1\AdventOfCode2022.genruntimeconfig.cache

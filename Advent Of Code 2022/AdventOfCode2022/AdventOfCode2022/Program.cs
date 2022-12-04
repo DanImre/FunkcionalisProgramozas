@@ -112,6 +112,34 @@ namespace AdventOfCode2022
 
             Console.WriteLine("Sum of the priorities of badges: " + sum);
         }
+        
+        public static void Negyedik()
+        {
+            string[] s = File.ReadAllLines("negyedik.txt");
+            int db = 0;
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(',');
+                int[] elso = temp[0].Split('-').Select(kk => int.Parse(kk)).ToArray();
+                int[] masodik = temp[1].Split('-').Select(kk => int.Parse(kk)).ToArray();
+                if ((elso[0] >= masodik[0] && elso[1] <= masodik[1]) || (elso[0] <= masodik[0] && elso[1] >= masodik[1]))
+                    db++;
+            }
+            Console.WriteLine("Containing pairs: " + db);
+
+            //2. rész
+            db = 0;
+            List<(int, int)> ranges = new List<(int, int)>();
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(',');
+                int[] elso = temp[0].Split('-').Select(kk => int.Parse(kk)).ToArray();
+                int[] masodik = temp[1].Split('-').Select(kk => int.Parse(kk)).ToArray();
+                if ((elso[0] <= masodik[0] && elso[1] >= masodik[0]) || (masodik[0] <= elso[0] && masodik[1] >= elso[0]))
+                    db++;
+            }
+            Console.WriteLine("Overlaping pairs: " + db);
+        }
 
         static void Main(string[] args)
         {
@@ -127,6 +155,9 @@ namespace AdventOfCode2022
                     break;
                 case 3:
                     Harmadik();
+                    break;
+                case 4:
+                    Negyedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
