@@ -8,6 +8,13 @@ namespace AdventOfCode2022
 {
     class Program
     {
+
+        public class valami
+        {
+            public int age = 22;
+            public int height = 180;
+
+        }
         public static void Elso()
         {
             List<string> s = File.ReadAllLines("elso.txt").ToList();
@@ -94,6 +101,7 @@ namespace AdventOfCode2022
                 int duplicate = firstCompartment.Where(kk => secondCompartment.Contains(kk)).First();
 
                 sum += duplicate < 91 ? duplicate - 38 : duplicate - 96;
+
             }
 
             Console.WriteLine("Sum of the priorities: " + sum);
@@ -141,6 +149,124 @@ namespace AdventOfCode2022
             Console.WriteLine("Overlaping pairs: " + db);
         }
 
+        public static void Otodik()
+        {
+            List<Stack<char>> cargo = new List<Stack<char>>();
+            string[] s = File.ReadAllLines("otodik.txt");
+
+            //Searches for the line ' 1   2   3   4   5   6   7   8   9 ' and gets the last integer
+            int howManyStacks = int.Parse(s.Where(kk => kk[1] == '1').First().Trim().Last().ToString());
+            for (int i = 0; i < howManyStacks; i++)
+                cargo.Add(new Stack<char>());
+
+            foreach (var i in s)
+            {
+                if (i[1] == '1')
+                    break;
+
+                //removing first char
+                string item = i.Remove(0, 1);
+                for (int j = 0; j < item.Length; j++)
+                {
+                    //getting eery forth char (excluding '[', ']' and extra spaces
+                    if (j % 4 != 0 || item[j] == ' ')
+                        continue;
+
+                    cargo[j/4].Push(item[j]);
+                }
+            }
+
+            //reversing the order
+            for (int i = 0; i < howManyStacks; i++)
+                cargo[i] = new Stack<char>(cargo[i]); //Works cuz it uses '.Push' in the constructor
+
+            //selecting the steps
+            s = s.Where(kk => kk.IndexOf('m') == 0).ToArray();
+
+            foreach (var item in s)
+            {
+                //[0] -> move | [1] -> from | [2] -> where
+                int[] temp = item.Split(' ').Where(kk => !kk.Contains('o')).Select(kk => int.Parse(kk)).ToArray();
+
+                //moving crates
+                for (int i = 0; i < temp[0]; i++)
+                    cargo[temp[2] - 1].Push(cargo[temp[1] - 1].Pop());
+            }
+
+            Console.Write("CrateMover 9000 toppings: ");
+            foreach (var item in cargo)
+                    Console.Write(item.Peek());
+
+            Console.WriteLine();
+
+            //2. rész
+
+            cargo = new List<Stack<char>>();
+            s = File.ReadAllLines("otodik.txt");
+
+            for (int i = 0; i < howManyStacks; i++)
+                cargo.Add(new Stack<char>());
+
+            foreach (var i in s)
+            {
+                if (i[1] == '1')
+                    break;
+
+                //removing first char
+                string item = i.Remove(0, 1);
+                for (int j = 0; j < item.Length; j++)
+                {
+                    if (j % 4 != 0 || item[j] == ' ')
+                        continue;
+
+                    cargo[j / 4].Push(item[j]);
+                }
+            }
+
+            for (int i = 0; i < howManyStacks; i++)
+                cargo[i] = new Stack<char>(cargo[i]);
+
+            s = s.Where(kk => kk.IndexOf('m') == 0).ToArray();
+
+            foreach (var item in s)
+            {
+                int[] temp = item.Split(' ').Where(kk => !kk.Contains('o')).Select(kk => int.Parse(kk)).ToArray();
+
+                Stack<char> tempStack = new Stack<char>();
+
+                for (int i = 0; i < temp[0]; i++)
+                    tempStack.Push(cargo[temp[1] - 1].Pop());
+
+                for (int i = 0; i < temp[0]; i++)
+                    cargo[temp[2] - 1].Push(tempStack.Pop());
+            }
+
+            Console.Write("CrateMover 9001 toppings: ");
+            foreach (var item in cargo)
+                Console.Write(item.Peek());
+            Console.WriteLine();
+        }
+
+        //for testing
+        private static void stackRepresentation(List<Stack<char>> y)
+        {
+            List<Stack<char>> x = new List<Stack<char>>();
+            foreach (var item in y)
+                x.Add(new Stack<char>(item.Reverse()));
+
+            while (x.Count(kk => kk.Count != 0) != 0)
+            {
+                foreach (var item in x)
+                {
+                    if (item.Count == 0)
+                        Console.Write("  ");
+                    else
+                        Console.Write(item.Pop() + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Melyik feladat: ");
@@ -158,6 +284,9 @@ namespace AdventOfCode2022
                     break;
                 case 4:
                     Negyedik();
+                    break;
+                case 5:
+                    Otodik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
