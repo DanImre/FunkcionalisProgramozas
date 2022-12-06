@@ -8,13 +8,6 @@ namespace AdventOfCode2022
 {
     class Program
     {
-
-        public class valami
-        {
-            public int age = 22;
-            public int height = 180;
-
-        }
         public static void Elso()
         {
             List<string> s = File.ReadAllLines("elso.txt").ToList();
@@ -152,6 +145,7 @@ namespace AdventOfCode2022
         public static void Otodik()
         {
             List<Stack<char>> cargo = new List<Stack<char>>();
+            //string[] s = File.ReadAllLines("otodik.txt");
             string[] s = File.ReadAllLines("otodik.txt");
 
             //Searches for the line ' 1   2   3   4   5   6   7   8   9 ' and gets the last integer
@@ -247,6 +241,49 @@ namespace AdventOfCode2022
             Console.WriteLine();
         }
 
+        public static void Hatodik()
+        {
+            string s = File.ReadAllLines("hatodik.txt").First();
+            Queue<char> activeFour = new Queue<char>();
+            
+            for (int i = 0; i < 3; i++)
+                activeFour.Enqueue(s[i]);
+
+            int index = 4;
+
+            for (int i = 3; i < s.Length; i++)
+            {
+                index = i + 1;
+                activeFour.Enqueue(s[i]);
+                if (activeFour.Count(kk => activeFour.Count(zz => zz == kk) == 1) == 4)
+                    break;
+
+                activeFour.Dequeue();
+            }
+
+            Console.WriteLine("First start-of-packet marker pos: " + index);
+
+            //2. rész
+            Queue<char> activeFourteen = new Queue<char>();
+
+            for (int i = 0; i < 13; i++)
+                activeFourteen.Enqueue(s[i]);
+
+            index = 14;
+
+            for (int i = 13; i < s.Length; i++)
+            {
+                index = i + 1;
+                activeFourteen.Enqueue(s[i]);
+                if (activeFourteen.Count(kk => activeFourteen.Count(zz => zz == kk) == 1) == 14)
+                    break;
+
+                activeFourteen.Dequeue();
+            }
+
+            Console.WriteLine("First start-of-message marker pos: " + index);
+        }
+
         //for testing
         private static void stackRepresentation(List<Stack<char>> y)
         {
@@ -288,10 +325,14 @@ namespace AdventOfCode2022
                 case 5:
                     Otodik();
                     break;
+                case 6:
+                    Hatodik();
+                    break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
                     break;
             }
+
         }
     }
 }
