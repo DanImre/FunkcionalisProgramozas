@@ -284,6 +284,157 @@ namespace AdventOfCode2022
             Console.WriteLine("First start-of-message marker pos: " + index);
         }
 
+        public static void Hetedik()
+        {
+            
+            List<string> s = File.ReadAllLines("hetedik.txt").ToList();
+            //List<(string dir, int size)> x = new List<(string dir, int size)>();
+            Dictionary<string, int> x = new Dictionary<string, int>();
+            x.Add("/", 0);
+            Stack<string> filesThatImIn = new Stack<string>();
+            //több elkérési útvonal lehet / egy szinten lehet több ugyanolyan is
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(' ');
+                if (temp[0] == "$") //operation
+                {
+                    if (temp[1] == "ls")
+                        continue;
+
+                    if (temp[2] == "/")
+                    {
+                        filesThatImIn.Clear();
+                        filesThatImIn.Push("/");
+                    }
+                    else if (temp[2] == "..")
+                        filesThatImIn.Pop();
+                    else
+                        filesThatImIn.Push(concatStack(filesThatImIn) + temp[2]);
+                }
+                else if (temp[0] == "dir")
+                {
+                    if (!x.ContainsKey(concatStack(filesThatImIn) + temp[1]))
+                        x.Add(concatStack(filesThatImIn) + temp[1], 0);
+                }
+                else
+                    foreach (var i in filesThatImIn)
+                        x[i] += int.Parse(temp[0]);
+            }
+            Console.WriteLine("Total size of at most 100 000' folders: " + x.Where(kk => kk.Value <= 100000).Sum(kk => kk.Value));
+
+            //2. rész
+            Console.WriteLine("Folder size: " + x.Where(kk => kk.Value >= 30000000 - (70000000 - x["/"])).OrderBy(kk => kk.Value).First().Value);
+        }
+
+        public static void Nyolcadik()
+        {
+            //In ASCII the numbers start at 48 ( == '0')
+            List<List<int>> x = File.ReadAllLines("nyolcadik.txt").Select(kk => kk.Select(zz => zz - 48).ToList()).ToList();
+
+            int dbNotVisible = 0;
+            for (int i = 1; i < x.Count - 1; i++)
+                for (int j = 1; j < x[i].Count - 1; j++)
+                {
+                    //List<int> onLeft = x[i].Take(j).ToList();
+                    //List<int> onRight = x[i].TakeLast(x[i].Count - j).ToList();
+                    //List<int> onTop = x.Select(kk => kk[j]).Take(i).ToList();
+                    //List<int> onBottom = x.Select(kk => kk[j]).TakeLast(x.Count - i).ToList();
+
+                    //onLeft
+                    if (x[i].Take(j).All(kk => kk < x[i][j]))
+                        continue;
+
+                    //onRight
+                    if (x[i].TakeLast(x[i].Count - j - 1).All(kk => kk < x[i][j]))
+                        continue;
+
+                    //onTop
+                    if (x.Select(kk => kk[j]).Take(i).All(kk => kk < x[i][j]))
+                        continue;
+
+                    //onBottom
+                    if (x.Select(kk => kk[j]).TakeLast(x.Count - i - 1).All(kk => kk < x[i][j]))
+                        continue;
+
+                    ++dbNotVisible;
+                }
+
+            Console.WriteLine("Visible trees: " + (x.Count * x[0].Count - dbNotVisible));
+
+            //2. rész
+
+            int maxViewDistance = 0;
+            for (int i = 0; i < x.Count; i++)
+                for (int j = 1; j < x[i].Count - 1; j++)
+                {
+                    //List<int> onLeft = x[i].Take(j).ToList();
+                    //List<int> onRight = x[i].TakeLast(x[i].Count - j).ToList();
+                    //List<int> onTop = x.Select(kk => kk[j]).Take(i).ToList();
+                    //List<int> onBottom = x.Select(kk => kk[j]).TakeLast(x.Count - i).ToList();
+
+                    int tempMax = 1;
+                    //onLeft
+                    //tempMax *= x[i].Take(j).Reverse().TakeWhile(kk => kk < x[i][j]).Count() + 1;
+                    int temp = 0;
+                    foreach (var item in x[i].Take(j).Reverse())
+                    {
+                        ++temp;
+                        if (item >= x[i][j])
+                            break;
+                    }
+                    tempMax *= temp;
+
+                    //onRight
+                    //tempMax *= x[i].TakeLast(x[i].Count - j - 1).TakeWhile(kk => kk < x[i][j]).Count() + 1;
+                    temp = 0;
+                    foreach (var item in x[i].TakeLast(x[i].Count - j - 1))
+                    {
+                        ++temp;
+                        if (item >= x[i][j])
+                            break;
+                    }
+                    tempMax *= temp;
+
+                    //onTop
+                    //tempMax *= x.Select(kk => kk[j]).Take(i).Reverse().TakeWhile(kk => kk < x[i][j]).Count() + 1;
+                    temp = 0;
+                    foreach (var item in x.Select(kk => kk[j]).Take(i).Reverse())
+                    {
+                        ++temp;
+                        if (item >= x[i][j])
+                            break;
+                    }
+                    tempMax *= temp;
+
+                    //onBottom
+                    //tempMax *= x.Select(kk => kk[j]).TakeLast(x.Count - i - 1).TakeWhile(kk => kk < x[i][j]).Count() + 1;
+                    temp = 0;
+                    foreach (var item in x.Select(kk => kk[j]).TakeLast(x.Count - i - 1))
+                    {
+                        ++temp;
+                        if (item >= x[i][j])
+                            break;
+                    }
+                    tempMax *= temp;
+
+                    if (tempMax > maxViewDistance)
+                        maxViewDistance = tempMax;
+                }
+
+            Console.WriteLine("The highest scenic score possible: " + maxViewDistance);
+
+        }
+
+        private static string concatStack(Stack<string> stack)
+        {
+            string solution = "";
+            foreach (var item in stack.Where(kk => kk != "/").Select(kk => kk.Substring(1)))
+                solution += @"\" + item;
+
+            return solution;
+        }
+
         //for testing
         private static void stackRepresentation(List<Stack<char>> y)
         {
@@ -306,8 +457,13 @@ namespace AdventOfCode2022
 
         static void Main(string[] args)
         {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
             Console.WriteLine("Melyik feladat: ");
             int n = int.Parse(Console.ReadLine());
+
+            stopwatch.Start();
+
             switch (n)
             {
                 case 1:
@@ -328,10 +484,18 @@ namespace AdventOfCode2022
                 case 6:
                     Hatodik();
                     break;
+                case 7:
+                    Hetedik();
+                    break;
+                case 8:
+                    Nyolcadik();
+                    break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
                     break;
             }
+
+            Console.WriteLine("Eltelt idő: " + stopwatch.Elapsed);
 
         }
     }
