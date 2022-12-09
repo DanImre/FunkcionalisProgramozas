@@ -426,6 +426,139 @@ namespace AdventOfCode2022
 
         }
 
+        public static void Kilencedik()
+        {
+            string[] s = File.ReadAllLines("kilencedik.txt");
+            (int x, int y) head = (0, 0);
+            (int x, int y) tail = (0, 0);
+
+            List<(int x, int y)> visitedCords = new List<(int x, int y)>() { (0,0) };
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(' ');
+
+                (int x, int y) increment = (0, 0);
+
+                switch (temp[0])
+                {
+                    case "U":
+                        increment = (0, 1);
+                        break;
+                    case "D":
+                        increment = (0, -1);
+                        break;
+                    case "R":
+                        increment = (1, 0);
+                        break;
+                    default:
+                        increment = (-1, 0);
+                        break;
+                }
+
+                for (int i = 0; i < int.Parse(temp[1]); i++)
+                {
+                    if(Math.Abs(head.x + increment.x - tail.x) <= 1 && Math.Abs(head.y + increment.y - tail.y) <= 1)
+                    {
+                        head = (head.x + increment.x, head.y + increment.y);
+                        continue;
+                    }
+
+                    tail = head;
+                    if (!visitedCords.Contains(tail))
+                        visitedCords.Add(tail);
+                    head = (head.x + increment.x, head.y + increment.y);
+                }
+            }
+
+            Console.WriteLine("The tail visited: " + visitedCords.Count + " spots.");
+            
+            //2. rész
+
+            //1. -> Head | 2.-10. -> Tails
+            List<(int x, int y)> headsAndTails = new List<(int x, int y)>();
+            for (int i = 0; i < 10; i++)
+                headsAndTails.Add((0, 0));
+
+            visitedCords.Clear();
+            visitedCords.Add((0, 0));
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(' ');
+
+                (int x, int y) increment = (0, 0);
+
+                switch (temp[0])
+                {
+                    case "U":
+                        increment = (0, 1);
+                        break;
+                    case "D":
+                        increment = (0, -1);
+                        break;
+                    case "R":
+                        increment = (1, 0);
+                        break;
+                    default:
+                        increment = (-1, 0);
+                        break;
+                }
+
+                for (int i = 0; i < int.Parse(temp[1]); i++)
+                {
+                    //head moves
+                    headsAndTails[0] = (headsAndTails[0].x + increment.x, headsAndTails[0].y + increment.y);
+
+                    //diagonális lépésnél a lépéseket kell követni, egyébként csak a helyére kell menni
+                    
+                    for (int j = 1; j < headsAndTails.Count(); j++)
+                    {
+                        (int x, int y) tavolsag = (headsAndTails[j - 1].x - headsAndTails[j].x, headsAndTails[j - 1].y - headsAndTails[j].y);
+
+                        //doesnt need to move
+                        if (Math.Abs(tavolsag.x) <= 1 && Math.Abs(tavolsag.y) <= 1)
+                            break;
+
+                        //jobbrafel
+                        if (tavolsag.x > 0 && tavolsag.y > 0)
+                            headsAndTails[j] = (headsAndTails[j].x + 1, headsAndTails[j].y + 1);
+                        //balrafel
+                        else if(tavolsag.x < 0 && tavolsag.y > 0)
+                            headsAndTails[j] = (headsAndTails[j].x - 1, headsAndTails[j].y + 1);
+                        //jobbrale
+                        else if(tavolsag.x > 0 && tavolsag.y < 0)
+                            headsAndTails[j] = (headsAndTails[j].x + 1, headsAndTails[j].y - 1);
+                        //balrale
+                        else if(tavolsag.x < 0 && tavolsag.y < 0)
+                            headsAndTails[j] = (headsAndTails[j].x - 1, headsAndTails[j].y - 1);
+                        //jobbra
+                        else if (tavolsag.x > 0)
+                            headsAndTails[j] = (headsAndTails[j].x + 1, headsAndTails[j].y);
+                        //balra
+                        else if (tavolsag.x < 0)
+                            headsAndTails[j] = (headsAndTails[j].x - 1, headsAndTails[j].y);
+                        //fel
+                        else if (tavolsag.y > 0)
+                            headsAndTails[j] = (headsAndTails[j].x, headsAndTails[j].y + 1);
+                        //le
+                        else
+                            headsAndTails[j] = (headsAndTails[j].x, headsAndTails[j].y - 1);
+
+                        if (j == 9 && !visitedCords.Contains(headsAndTails[j]))
+                            visitedCords.Add(headsAndTails[j]);
+                    }
+                }
+
+                //ki
+                /*
+                kiirasKilencedik(headsAndTails);
+                */
+            }
+
+            Console.WriteLine("The 9th tail visited: " + visitedCords.Count + " spots.");
+        }
+
         private static string concatStack(Stack<string> stack)
         {
             string solution = "";
@@ -436,6 +569,31 @@ namespace AdventOfCode2022
         }
 
         //for testing
+
+        private static void kiirasKilencedik(List<(int x, int y)> headsAndTails)
+        {
+            for (int l = 18; l >= -18; l--)
+            {
+                for (int j = -18; j <= 18; j++)
+                {
+                    bool megvan = false;
+                    for (int zz = 0; zz < headsAndTails.Count; zz++)
+                    {
+                        if (headsAndTails[zz] != (j, l))
+                            continue;
+
+                        Console.Write(zz + " ");
+                        megvan = true;
+                        break;
+                    }
+                    if (!megvan)
+                        Console.Write(". ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("---------------------------------------");
+        }
+
         private static void stackRepresentation(List<Stack<char>> y)
         {
             List<Stack<char>> x = new List<Stack<char>>();
@@ -460,8 +618,10 @@ namespace AdventOfCode2022
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
             Console.WriteLine("Melyik feladat: ");
-            int n = int.Parse(Console.ReadLine());
-
+            int n = 0;
+            while (!int.TryParse(Console.ReadLine(), out n))
+                Console.WriteLine("Az nem egy szám!");
+            
             stopwatch.Start();
 
             switch (n)
@@ -489,6 +649,9 @@ namespace AdventOfCode2022
                     break;
                 case 8:
                     Nyolcadik();
+                    break;
+                case 9:
+                    Kilencedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
