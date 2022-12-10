@@ -559,6 +559,36 @@ namespace AdventOfCode2022
             Console.WriteLine("The 9th tail visited: " + visitedCords.Count + " spots.");
         }
 
+        public static void Tizedik()
+        {
+            string[] s = File.ReadAllLines("tizedik.txt");
+            int sum = 0;
+            int actValue = 1;
+            int cycle = 0;
+
+            foreach (var item in s)
+            {
+                if (item[0] == 'n')
+                {
+                    ++cycle;
+                    if (cycle % 40 == 20)
+                        sum += cycle * actValue;
+                    continue;
+                }
+
+
+                for (int i = 0; i < 2; i++)
+                {
+                    ++cycle;
+                    if (cycle % 40 == 20)
+                        sum += cycle * actValue;
+                }
+                actValue += int.Parse(item.Split(' ')[1]);
+
+            }
+            Console.WriteLine("Sum of the signal strengths: " + sum);
+        }
+
         private static string concatStack(Stack<string> stack)
         {
             string solution = "";
@@ -652,6 +682,9 @@ namespace AdventOfCode2022
                     break;
                 case 9:
                     Kilencedik();
+                    break;
+                case 10:
+                    Tizedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
