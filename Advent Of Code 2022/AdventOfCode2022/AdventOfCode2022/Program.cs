@@ -587,6 +587,40 @@ namespace AdventOfCode2022
 
             }
             Console.WriteLine("Sum of the signal strengths: " + sum);
+
+            //2. rész:
+
+            string[,] pixels = new string[6, 40];
+
+            actValue = 1;
+            cycle = 0;
+
+            foreach (var item in s)
+            {
+                //start of the cycle
+
+                //If it's close enough
+                pixels[(int)Math.Floor(cycle / 40.0), cycle % 40] = Math.Abs((cycle % 40) - actValue) <= 1 ? "#" : ".";
+
+                ++cycle;
+
+                if (item[0] == 'n') //noop only takes 1 cycle
+                    continue;
+
+                //second half of the cycle
+                pixels[(int)Math.Floor(cycle / 40.0), cycle % 40] = Math.Abs((cycle % 40) - actValue) <= 1 ? "#" : ".";
+                
+                ++cycle;
+
+                actValue += int.Parse(item.Split(' ')[1]);
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 40; j++)
+                    Console.Write(pixels[i,j]);
+                Console.WriteLine();
+            }
         }
 
         private static string concatStack(Stack<string> stack)
