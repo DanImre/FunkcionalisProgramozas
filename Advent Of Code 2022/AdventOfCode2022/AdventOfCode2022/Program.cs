@@ -623,6 +623,402 @@ namespace AdventOfCode2022
             }
         }
 
+        class Monkey
+        {
+            public int inspectedItems { get; set; }
+            public List<long> items { get; set; }
+            public Func<long, long> operation { get; set; }
+            public Func<long, bool> test { get; set; }
+
+            public int trueThrow { get; set; }
+            public int falseThrow { get; set; }
+
+
+
+            public Monkey(int a, List<long> b)
+            {
+                inspectedItems = a;
+                items = b;
+            }
+
+            public Monkey()
+            {
+                inspectedItems = 0;
+                items = new List<long>();
+            }
+
+        }
+
+        class Item
+        {
+            public List<int> szorzok { get; set; }
+            public Item()
+            {
+                szorzok = new List<int>();
+            }
+
+            public Item(int a)
+            {
+                szorzok = new List<int>() { 1, a };
+                rendezes();
+            }
+
+            public static Item operator +(Item a, int b)
+            {
+                Item c = new Item();
+                c.szorzok = new List<int>(a.szorzok);
+
+                c.hozzaadas(b);
+
+                return c;
+            }
+
+            //a == b
+            public static Item operator +(Item a, Item b)
+            {
+                Item c = new Item();
+                c.szorzok = new List<int>(a.szorzok);
+
+                c.szorzok.Add(2);
+                c.rendezes();
+
+                return c;
+            }
+
+            public static Item operator *(Item a, int b)
+            {
+                Item c = new Item();
+                c.szorzok = new List<int>(a.szorzok);
+
+                c.szorzok.Add(b);
+
+                c.rendezes();
+
+                return c;
+            }
+
+            //a == b
+            public static Item operator *(Item a, Item b)
+            {
+                //h a plusszok 0 - ák, akkor semmit nem kell csinálni, mert a prím tényezős szorzók ugyanazok
+                Item c = new Item();
+                c.szorzok = new List<int>(a.szorzok);
+
+                foreach (var item in b.szorzok)
+                    c.szorzok.Add(item);
+
+                c.rendezes();
+
+                return c;
+            }
+
+            public static List<int> primes;
+
+            public void rendezes()
+            {
+                List<int> ujSzorzok = new List<int>();
+
+                for (int i = 0; i < szorzok.Count; i++)
+                {
+                    int tempSzorzo = szorzok[i];
+                    while (true)
+                    {
+                        bool talalt = false;
+                        foreach (var item in primes)
+                            if(tempSzorzo % item == 0)
+                            {
+                                ujSzorzok.Add(item);
+                                tempSzorzo /= item;
+                                talalt = true;
+                            }
+
+                        if (!talalt)
+                        {
+                            ujSzorzok.Add(tempSzorzo);
+                            break;
+                        }
+                    }
+                }
+
+                //hozzaadasnal lehet szar lesz ha distinct
+                //szorzok = new List<int>(ujSzorzok.Distinct());
+                ujSzorzok.Remove(1);
+                ujSzorzok.Add(1);
+                szorzok = new List<int>(ujSzorzok);
+            }
+
+            public void hozzaadas(int a)
+            {
+                List<int> szorzokamikmaradnak = new List<int>() { 1 };
+                int temp = a;
+                while (true)
+                {
+                    bool talalt = false;
+                    foreach (var item in szorzok)
+                        if (item != 1 && temp % item == 0)
+                        {
+                            szorzokamikmaradnak.Add(item);
+                            temp /= item;
+                            talalt = true;
+                        }
+
+                    if(!talalt)
+                    {
+                        //nem felhasznált szorzók
+                        int temptemp = 1;
+                        foreach (var item in szorzok)
+                            if(!szorzokamikmaradnak.Contains(item))
+                            {
+                                temptemp *= item;
+                            }
+
+                        //nem felhasznált szorzók + maradék
+                        szorzokamikmaradnak.Add(temptemp + temp);
+                        break;
+                    }
+                }
+
+                //szorzok = new List<int>(szorzokamikmaradnak.Distinct());
+                szorzok = new List<int>(szorzokamikmaradnak);
+                rendezes();
+            }
+
+            public static int operator %(Item a, int b)
+            {
+                //b is prímszám
+
+                if (a.szorzok.Contains(b))
+                    return 0;
+                else
+                    return 1;//mindegy mit adunk viszsa csak ne legyen 0
+                
+            }
+
+        }
+
+        class MonkeyPartTwo
+        {
+            public int inspectedItems { get; set; }
+            public List<Item> items { get; set; }
+            public Func<Item, Item> operation { get; set; }
+            public Func<Item, bool> test { get; set; }
+
+            public int trueThrow { get; set; }
+            public int falseThrow { get; set; }
+
+            public MonkeyPartTwo()
+            {
+                inspectedItems = 0;
+                items = new List<Item>();
+            }
+
+        }
+
+
+        public static void Tizenegyedik()
+        {
+            //string[] s = File.ReadAllLines("tizenegyedikproba.txt");
+            string[] s = File.ReadAllLines("tizenegyedik.txt");
+            List<Monkey> x = new List<Monkey>();
+
+            //prímek:
+            Item.primes = new List<int>();
+            for (int i = 2; i < 1000; i++) // 1000 ig prímek
+            {
+                bool oszthato = false;
+                foreach (var item in Item.primes)
+                    if (i % item == 0)
+                    {
+                        oszthato = true;
+                        break;
+                    }
+
+                if (!oszthato)
+                    Item.primes.Add(i);
+            }
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(' ');
+
+                if (temp[0] == "Monkey")
+                {
+                    x.Add(new Monkey());
+                    continue;
+                }
+                string sor = item.Trim();
+
+                if(sor.Contains("items"))
+                {
+                    temp = sor.Split(':').Last().Split(',').Select(kk => kk.Trim()).ToArray();
+
+                    foreach (var i in temp)
+                        x[x.Count - 1].items.Add(int.Parse(i));
+
+                    continue;
+                }
+
+                if(sor.Contains("Operation"))
+                {
+                    sor = sor.Split('=').Last();
+
+                    //+
+                    if(sor.Contains('+'))
+                    {
+                        temp = sor.Split('+').Select(kk => kk.Trim()).ToArray();
+                        if (temp[0] == "old" && temp[1] == "old")
+                            x[x.Count - 1].operation = kk => kk + kk;
+                        else
+                            x[x.Count - 1].operation = kk => kk + int.Parse(temp[1]);
+                        
+                        continue;
+                    }
+
+                    //*
+                    if (sor.Contains('*'))
+                    {
+                        temp = sor.Split('*').Select(kk => kk.Trim()).ToArray();
+                        if (temp[0] == "old" && temp[1] == "old")
+                            x[x.Count - 1].operation = kk => kk * kk;
+                        else
+                            x[x.Count - 1].operation = kk => kk * int.Parse(temp[1]);
+                        
+                        continue;
+                    }
+                }
+
+                else if(sor.Contains("Test"))
+                    x[x.Count - 1].test = (kk => kk % int.Parse(sor.Split(' ').Last()) == 0);
+                else if(sor.Contains("true"))
+                    x[x.Count - 1].trueThrow = int.Parse(sor.Split(' ').Last());
+                else if(sor.Contains("false"))
+                    x[x.Count - 1].falseThrow = int.Parse(sor.Split(' ').Last());
+
+            }
+
+            //1. rész
+
+            for (int j = 0; j < 20; j++)
+                for (int i = 0; i < x.Count; i++)
+                {
+                    foreach (var item in x[i].items)
+                    {
+                        int newItem = (int)Math.Floor(x[i].operation(item) / 3.0);
+                        //long newItem = x[i].operation(item);
+                        
+                        if (x[i].test(newItem))
+                            x[x[i].trueThrow].items.Add(newItem);
+                        else
+                            x[x[i].falseThrow].items.Add(newItem);
+                        
+                        ++x[i].inspectedItems;
+                    }
+
+                    x[i].items.Clear();
+                }
+
+            int solution = 1;
+            foreach (var item in x.Select(kk => kk.inspectedItems).OrderByDescending(kk => kk).Take(2))
+                solution *= item;
+
+            Console.WriteLine("The level of monkey business after 20 rounds: " + solution);
+
+            //2. rész
+
+            x = new List<Monkey>();
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(' ');
+
+                if (temp[0] == "Monkey")
+                {
+                    x.Add(new Monkey());
+                    continue;
+                }
+                string sor = item.Trim();
+
+                if (sor.Contains("items"))
+                {
+                    temp = sor.Split(':').Last().Split(',').Select(kk => kk.Trim()).ToArray();
+
+                    foreach (var i in temp)
+                        x[x.Count - 1].items.Add(int.Parse(i));
+
+                    continue;
+                }
+
+                if (sor.Contains("Operation"))
+                {
+                    sor = sor.Split('=').Last();
+
+                    //+
+                    if (sor.Contains('+'))
+                    {
+                        temp = sor.Split('+').Select(kk => kk.Trim()).ToArray();
+                        if (temp[0] == "old" && temp[1] == "old")
+                            x[x.Count - 1].operation = kk => kk + kk;
+                        else
+                            x[x.Count - 1].operation = kk => kk + int.Parse(temp[1]);
+
+                        continue;
+                    }
+
+                    //*
+                    if (sor.Contains('*'))
+                    {
+                        temp = sor.Split('*').Select(kk => kk.Trim()).ToArray();
+                        if (temp[0] == "old" && temp[1] == "old")
+                            x[x.Count - 1].operation = kk => kk * kk;
+                        else
+                            x[x.Count - 1].operation = kk => kk * int.Parse(temp[1]);
+
+                        continue;
+                    }
+                }
+
+                else if (sor.Contains("Test"))
+                    x[x.Count - 1].test = (kk => kk % int.Parse(sor.Split(' ').Last()) == 0);
+                else if (sor.Contains("true"))
+                    x[x.Count - 1].trueThrow = int.Parse(sor.Split(' ').Last());
+                else if (sor.Contains("false"))
+                    x[x.Count - 1].falseThrow = int.Parse(sor.Split(' ').Last());
+
+            }
+
+            long number = 1;
+            foreach (var item in s)
+            {
+                if (item.Contains("Test"))
+                    number *= long.Parse(item.Split(' ').Last());
+            }
+
+            for (int j = 0; j < 10000; j++)
+                for (int i = 0; i < x.Count; i++)
+                {
+                    foreach (var item in x[i].items)
+                    {
+                        long newItem = x[i].operation(item);
+                        newItem %= number;
+
+                        if (x[i].test(newItem))
+                            x[x[i].trueThrow].items.Add(newItem);
+                        else
+                            x[x[i].falseThrow].items.Add(newItem);
+
+                        ++x[i].inspectedItems;
+                    }
+
+                    x[i].items.Clear();
+                }
+
+            long solutionTwo = 1;
+            foreach (var item in x.Select(kk => kk.inspectedItems).OrderByDescending(kk => kk).Take(2))
+                solutionTwo *= item;
+
+            Console.WriteLine("The level of monkey business after 10000 rounds: " + solutionTwo);
+
+        }
         private static string concatStack(Stack<string> stack)
         {
             string solution = "";
@@ -719,6 +1115,9 @@ namespace AdventOfCode2022
                     break;
                 case 10:
                     Tizedik();
+                    break;
+                case 11:
+                    Tizenegyedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
