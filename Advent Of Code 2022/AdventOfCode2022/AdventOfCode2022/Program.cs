@@ -649,193 +649,11 @@ namespace AdventOfCode2022
 
         }
 
-        class Item
-        {
-            public List<int> szorzok { get; set; }
-            public Item()
-            {
-                szorzok = new List<int>();
-            }
-
-            public Item(int a)
-            {
-                szorzok = new List<int>() { 1, a };
-                rendezes();
-            }
-
-            public static Item operator +(Item a, int b)
-            {
-                Item c = new Item();
-                c.szorzok = new List<int>(a.szorzok);
-
-                c.hozzaadas(b);
-
-                return c;
-            }
-
-            //a == b
-            public static Item operator +(Item a, Item b)
-            {
-                Item c = new Item();
-                c.szorzok = new List<int>(a.szorzok);
-
-                c.szorzok.Add(2);
-                c.rendezes();
-
-                return c;
-            }
-
-            public static Item operator *(Item a, int b)
-            {
-                Item c = new Item();
-                c.szorzok = new List<int>(a.szorzok);
-
-                c.szorzok.Add(b);
-
-                c.rendezes();
-
-                return c;
-            }
-
-            //a == b
-            public static Item operator *(Item a, Item b)
-            {
-                //h a plusszok 0 - ák, akkor semmit nem kell csinálni, mert a prím tényezős szorzók ugyanazok
-                Item c = new Item();
-                c.szorzok = new List<int>(a.szorzok);
-
-                foreach (var item in b.szorzok)
-                    c.szorzok.Add(item);
-
-                c.rendezes();
-
-                return c;
-            }
-
-            public static List<int> primes;
-
-            public void rendezes()
-            {
-                List<int> ujSzorzok = new List<int>();
-
-                for (int i = 0; i < szorzok.Count; i++)
-                {
-                    int tempSzorzo = szorzok[i];
-                    while (true)
-                    {
-                        bool talalt = false;
-                        foreach (var item in primes)
-                            if(tempSzorzo % item == 0)
-                            {
-                                ujSzorzok.Add(item);
-                                tempSzorzo /= item;
-                                talalt = true;
-                            }
-
-                        if (!talalt)
-                        {
-                            ujSzorzok.Add(tempSzorzo);
-                            break;
-                        }
-                    }
-                }
-
-                //hozzaadasnal lehet szar lesz ha distinct
-                //szorzok = new List<int>(ujSzorzok.Distinct());
-                ujSzorzok.Remove(1);
-                ujSzorzok.Add(1);
-                szorzok = new List<int>(ujSzorzok);
-            }
-
-            public void hozzaadas(int a)
-            {
-                List<int> szorzokamikmaradnak = new List<int>() { 1 };
-                int temp = a;
-                while (true)
-                {
-                    bool talalt = false;
-                    foreach (var item in szorzok)
-                        if (item != 1 && temp % item == 0)
-                        {
-                            szorzokamikmaradnak.Add(item);
-                            temp /= item;
-                            talalt = true;
-                        }
-
-                    if(!talalt)
-                    {
-                        //nem felhasznált szorzók
-                        int temptemp = 1;
-                        foreach (var item in szorzok)
-                            if(!szorzokamikmaradnak.Contains(item))
-                            {
-                                temptemp *= item;
-                            }
-
-                        //nem felhasznált szorzók + maradék
-                        szorzokamikmaradnak.Add(temptemp + temp);
-                        break;
-                    }
-                }
-
-                //szorzok = new List<int>(szorzokamikmaradnak.Distinct());
-                szorzok = new List<int>(szorzokamikmaradnak);
-                rendezes();
-            }
-
-            public static int operator %(Item a, int b)
-            {
-                //b is prímszám
-
-                if (a.szorzok.Contains(b))
-                    return 0;
-                else
-                    return 1;//mindegy mit adunk viszsa csak ne legyen 0
-                
-            }
-
-        }
-
-        class MonkeyPartTwo
-        {
-            public int inspectedItems { get; set; }
-            public List<Item> items { get; set; }
-            public Func<Item, Item> operation { get; set; }
-            public Func<Item, bool> test { get; set; }
-
-            public int trueThrow { get; set; }
-            public int falseThrow { get; set; }
-
-            public MonkeyPartTwo()
-            {
-                inspectedItems = 0;
-                items = new List<Item>();
-            }
-
-        }
-
-
         public static void Tizenegyedik()
         {
             //string[] s = File.ReadAllLines("tizenegyedikproba.txt");
             string[] s = File.ReadAllLines("tizenegyedik.txt");
             List<Monkey> x = new List<Monkey>();
-
-            //prímek:
-            Item.primes = new List<int>();
-            for (int i = 2; i < 1000; i++) // 1000 ig prímek
-            {
-                bool oszthato = false;
-                foreach (var item in Item.primes)
-                    if (i % item == 0)
-                    {
-                        oszthato = true;
-                        break;
-                    }
-
-                if (!oszthato)
-                    Item.primes.Add(i);
-            }
 
             foreach (var item in s)
             {
@@ -924,8 +742,6 @@ namespace AdventOfCode2022
             Console.WriteLine("The level of monkey business after 20 rounds: " + solution);
 
             //2. rész
-
-            x = new List<Monkey>();
 
             foreach (var item in s)
             {
@@ -1019,6 +835,540 @@ namespace AdventOfCode2022
             Console.WriteLine("The level of monkey business after 10000 rounds: " + solutionTwo);
 
         }
+
+        public static void Tizenkettedik()
+        {
+            string[] s = File.ReadAllLines("tizenkettedik.txt");
+            List<List<int>> x = new List<List<int>>();
+            (int x, int y) kezdes = (0, 0);
+            (int x, int y) veg = (0, 0);
+
+            //beolvasás
+            for (int i = 0; i < s.Length; i++)
+            {
+                List<int> temp = new List<int>();
+                for (int j = 0; j < s[i].Length; j++)
+                {
+                    if (s[i][j] == 'S')
+                    {
+                        kezdes = (i, j);
+                        temp.Add(0);
+                        continue;
+                    }
+
+                    if (s[i][j] == 'E')
+                    {
+                        veg = (i, j);
+                        temp.Add('z' - 97);
+                        continue;
+                    }
+
+                    temp.Add(s[i][j] - 97);
+                }
+                x.Add(temp);
+            }
+
+            //setup
+            List<List<int>> dist = new List<List<int>>();
+            for (int i = 0; i < x.Count; i++)
+            {
+                List<int> tempdist = new List<int>();
+                for (int j = 0; j < x[i].Count; j++)
+                    tempdist.Add(int.MaxValue);
+
+                dist.Add(tempdist);
+            }
+
+            dist[kezdes.x][kezdes.y] = 0;
+
+            Queue<(int x, int y)> q = new Queue<(int x, int y)>();
+            q.Enqueue(kezdes);
+
+            //actual algorithm
+            while (q.Count != 0)
+            {
+                var temp = q.Dequeue();
+
+                if (temp.x == veg.x && temp.y == veg.y)
+                    break;
+
+                int mostaniErtek = x[temp.x][temp.y];
+                int nextDist = dist[temp.x][temp.y] + 1;
+
+                //jobbra
+                if (temp.x < x.Count - 1 && x[temp.x + 1][temp.y] - mostaniErtek <= 1)
+                {
+                    if (nextDist < dist[temp.x + 1][temp.y])
+                    {
+                        q.Enqueue((temp.x + 1, temp.y));
+                        dist[temp.x + 1][temp.y] = nextDist;
+                    }
+                }
+                //balra
+                if (temp.x > 0 && x[temp.x - 1][temp.y] - mostaniErtek <= 1)
+                {
+                    if (nextDist < dist[temp.x - 1][temp.y])
+                    {
+                        q.Enqueue((temp.x - 1, temp.y));
+                        dist[temp.x - 1][temp.y] = nextDist;
+                    }
+                }
+                //fel
+                if (temp.y < x[0].Count - 1 && x[temp.x][temp.y + 1] - mostaniErtek <= 1)
+                {
+                    if (nextDist < dist[temp.x][temp.y + 1])
+                    {
+                        q.Enqueue((temp.x, temp.y + 1));
+                        dist[temp.x][temp.y + 1] = nextDist;
+                    }
+                }
+                //le
+                if (temp.y > 0 && x[temp.x][temp.y - 1] - mostaniErtek <= 1)
+                {
+                    if (nextDist < dist[temp.x][temp.y - 1])
+                    {
+                        q.Enqueue((temp.x, temp.y - 1));
+                        dist[temp.x][temp.y - 1] = nextDist;
+                    }
+                }
+            }
+
+            Console.WriteLine("Shortest path to E: " + dist[veg.x][veg.y]);
+
+            //2. rész:
+
+            List<int> solutions = new List<int>();
+
+            for (int l = 0; l < x.Count; l++)
+            {
+                for (int k = 0; k < x[l].Count; k++)
+                {
+                    if (x[l][k] != 0)
+                        continue;
+
+                    //reseting everything
+                    q = new Queue<(int x, int y)>();
+                    q.Enqueue((l,k));
+
+                    dist = new List<List<int>>();
+                    for (int i = 0; i < x.Count; i++)
+                    {
+                        List<int> tempdist = new List<int>();
+                        for (int j = 0; j < x[i].Count; j++)
+                            tempdist.Add(int.MaxValue);
+
+                        dist.Add(tempdist);
+                    }
+
+                    dist[l][k] = 0;
+
+                    while (q.Count != 0)
+                    {
+                        var temp = q.Dequeue();
+
+                        if (temp.x == veg.x && temp.y == veg.y)
+                            break;
+
+                        int mostaniErtek = x[temp.x][temp.y];
+                        int nextDist = dist[temp.x][temp.y] + 1;
+
+                        //jobbra
+                        if (temp.x < x.Count - 1 && x[temp.x + 1][temp.y] - mostaniErtek <= 1)
+                        {
+                            if (nextDist < dist[temp.x + 1][temp.y])
+                            {
+                                q.Enqueue((temp.x + 1, temp.y));
+                                dist[temp.x + 1][temp.y] = nextDist;
+
+                            }
+                        }
+                        //balra
+                        if (temp.x > 0 && x[temp.x - 1][temp.y] - mostaniErtek <= 1)
+                        {
+                            if (nextDist < dist[temp.x - 1][temp.y])
+                            {
+                                q.Enqueue((temp.x - 1, temp.y));
+                                dist[temp.x - 1][temp.y] = nextDist;
+                            }
+                        }
+                        //fel
+                        if (temp.y < x[0].Count - 1 && x[temp.x][temp.y + 1] - mostaniErtek <= 1)
+                        {
+                            if (nextDist < dist[temp.x][temp.y + 1])
+                            {
+                                q.Enqueue((temp.x, temp.y + 1));
+                                dist[temp.x][temp.y + 1] = nextDist;
+                            }
+                        }
+                        //le
+                        if (temp.y > 0 && x[temp.x][temp.y - 1] - mostaniErtek <= 1)
+                        {
+                            if (nextDist < dist[temp.x][temp.y - 1])
+                            {
+                                q.Enqueue((temp.x, temp.y - 1));
+                                dist[temp.x][temp.y - 1] = nextDist;
+                            }
+                        }
+                    }
+
+                    //getting length
+                    solutions.Add(dist[veg.x][veg.y]);
+                }
+            }
+
+            Console.WriteLine("Shortest path from any 'a's: " + solutions.Min());
+
+            //where it came from, so we can traverse it
+            //List<List<(int x, int y)>> prev = new List<List<(int x, int y)>>();
+            //we need to know if it had a 0 in its path
+            //List<List<(int x, int y, int value)>> prev = new List<List<(int x, int y, int value)>>();
+            //I dont even need this xD
+
+
+        }
+
+        class Item
+        {
+            public bool isList { get; set; }
+            public int value { get; set; }
+            public List<Item> list { get; set; }
+            public Item parent { get; set; }
+
+            public Item()
+            {
+                isList = true;
+                list = new List<Item>();
+            }
+
+            public Item(int a)
+            {
+                isList = false;
+                value = a;
+            }
+
+            public Item(Item a)
+            {
+                isList = true;
+                list = new List<Item>() { a };
+            }
+        }
+
+        public static void Tizenharmadik()
+        {
+            string[] s = File.ReadAllLines("tizenharmadik.txt").Where(kk => kk != "").ToArray();
+            List<(Item bal, Item jobb)> x = new List<(Item bal, Item jobb)>();
+
+            //beolvasás
+            Item tempBal = new Item();
+            Item tempJobb = new Item();
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                string sor = "";
+                for (int uuu = 0; uuu < s[i].Length; uuu++)
+                {
+                    if (s[i][uuu] == ']')
+                        sor += ',';
+
+                    sor += s[i][uuu];
+
+                    if (s[i][uuu] == '[')
+                        sor += ',';
+                }
+
+                if(i % 2 == 0)
+                {
+                    foreach (var item in sor.Split(',').Where(kk => kk != ""))
+                    {
+                        if (item == "[")
+                        {
+                            Item temp = new Item();
+                            tempBal.list.Add(temp);
+
+                            temp.parent = tempBal;
+                            tempBal = temp;
+                        }
+                        else if (item == "]")
+                            tempBal = tempBal.parent;
+                        else
+                            tempBal.list.Add(new Item(int.Parse(item)));
+                    }
+                }
+                else
+                {
+                    foreach (var item in sor.Split(',').Where(kk => kk != ""))
+                    {
+                        if (item == "[")
+                        {
+                            Item temp = new Item();
+                            tempJobb.list.Add(temp);
+
+                            temp.parent = tempJobb;
+                            tempJobb = temp;
+                        }
+                        else if (item == "]")
+                            tempJobb = tempJobb.parent;
+                        else
+                            tempJobb.list.Add(new Item(int.Parse(item)));
+                    }
+
+
+                    x.Add((tempBal.list[0], tempJobb.list[0]));
+
+                    tempBal = new Item();
+                    tempJobb = new Item();
+                }
+
+            }
+
+            List<int> indices = new List<int>();
+            for (int i = 0; i < x.Count; i++)
+            {
+                bool? result = compareTizenharom(x[i].bal, x[i].jobb);
+
+                if (result.HasValue && result.Value == true)
+                {
+                    //Console.WriteLine("In the right order: " + (i + 1));
+                    indices.Add(i + 1);
+                }
+            }
+
+            Console.WriteLine("Sum of the indices of the 'right' pairs: " + indices.Sum());
+
+            //2. rész
+
+            List<Item> y = new List<Item>();
+            foreach (var item in x)
+            {
+                y.Add(item.bal);
+                y.Add(item.jobb);
+            }
+            y.Add(new Item(new Item(new Item(2))));
+            y.Add(new Item(new Item(new Item(6))));
+
+            for (int i = 0; i < y.Count; i++)
+            {
+                for (int j = i + 1; j < y.Count; j++)
+                {
+                    bool? result = compareTizenharom(y[i], y[j]);
+
+                    //jó sorrend
+                    if (!result.HasValue || result.Value == true)
+                        continue;
+
+                    //rossz sorrend => swap
+                    Item temp = y[i];
+                    y[i] = y[j];
+                    y[j] = temp;
+                }
+            }
+
+            int kettes = 0;
+            int hatos = 0;
+
+            for (int i = 0; i < y.Count; i++)
+            {
+                if (y[i].isList
+                    && y[i].list.Count == 1
+                    && y[i].list[0].isList
+                    && y[i].list[0].list.Count == 1)
+                {
+                    if (y[i].list[0].list[0].value == 2)
+                        kettes = i + 1;
+                    else if (y[i].list[0].list[0].value == 6)
+                        hatos = i + 1;
+                }
+            }
+
+            Console.WriteLine("The decoder key for the distress signal: " + kettes * hatos);
+            
+            //kiiras
+            /*
+            Console.WriteLine(kettes + " " + hatos);
+            itemKiiras(y[kettes - 1]);
+            Console.WriteLine();
+            itemKiiras(y[hatos - 1]);
+            Console.WriteLine();
+
+            //bizonyítás hogy jól van sortolva:
+            for (int i = 0; i < y.Count - 1; i++)
+            {
+                itemKiiras(y[i]);
+                Console.WriteLine((compareTizenharom(y[i], y[i + 1]).Value ? " | igen" : " | NEM" ));
+            }
+            */
+        }
+
+        private static bool? compareTizenharom(Item a, Item b)
+        {
+            //minkettő lista
+            if (a.isList && b.isList)
+            {
+                int index = 0;
+                while (index < a.list.Count && index < b.list.Count)
+                {
+                    bool? result = compareTizenharom(a.list[index], b.list[index]);
+
+                    if (result.HasValue)
+                        return result.Value;
+
+                    ++index;
+                }
+
+                //egyszerre fogytak ki
+                if (index == a.list.Count && index == b.list.Count)
+                    return null;
+                //'a' fogyott ki
+                else if (index == a.list.Count)
+                    return true;
+                //'b' fogyott ki elobb
+                else
+                    return false;
+            }
+            //minkettő szam
+            else if (!a.isList && !b.isList)
+            {
+                if (a.value == b.value)
+                    return null;
+                else if (a.value < b.value)
+                    return true;
+                else
+                    return false;
+            }
+            //'a' lista, de 'b' nem
+            else if (a.isList && !b.isList)
+                return compareTizenharom(a, new Item(b)); //beletesszük egy listába
+            //'b' lista, de 'a' nem
+            else
+                return compareTizenharom(new Item(a), b); //beletesszük egy listába
+        }
+
+
+        public static void Tizennegyedik()
+        {
+
+            //feltételezem, hogy mindig lehet homokot kreállni (nem lesz olyan, hogy be lesz zárva)
+            //azt is, hogy akkor ér ki a homok, ha minden kőnél lejebb van (y kordinátája nagyobb mint akármelyik kőnek)
+            string[] s = File.ReadAllLines("tizennegyedikarpi.txt");
+
+            List<(int x, int y)> map = new List<(int x, int y)>();
+            map.Add((-10, -10));
+
+            (int x, int y) spawner = (500, 0);
+
+            //beolvasás
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(" -> ");
+                for (int i = 1; i < temp.Length; i++)
+                {
+
+                    int[] elsoCord = temp[i - 1].Split(',').Select(int.Parse).ToArray();
+                    int[] masodikCord = temp[i].Split(',').Select(int.Parse).ToArray();
+                    //ha x tengelyen volt mozgas:
+                    if (elsoCord[0] - masodikCord[0] != 0)
+                        for (int j = (elsoCord[0] < masodikCord[0] ? elsoCord[0] : masodikCord[0]); j <= (elsoCord[0] > masodikCord[0] ? elsoCord[0] : masodikCord[0]); j++)
+                        {
+                            if (map[map.Count - 1] != (j, elsoCord[1]))
+                                map.Add((j, elsoCord[1]));
+                        }
+                    //ha y tengelyen
+                    else
+                        for (int j = (elsoCord[1] < masodikCord[1] ? elsoCord[1] : masodikCord[1]); j <= (elsoCord[1] > masodikCord[1] ? elsoCord[1] : masodikCord[1]); j++)
+                        {
+                            if (map[map.Count - 1] != (elsoCord[0], j))
+                                map.Add((elsoCord[0], j));
+                        }
+                }
+            }
+
+            map.RemoveAt(0);
+
+            #region sandmap kiiras
+            /*
+            for (int i = map.Min(kk => kk.y); i <= map.Max(kk => kk.y); i++)
+            {
+                for (int j = map.Min(kk => kk.x); j <= map.Max(kk => kk.x); j++)
+                {
+                    if (map.Contains((j, i)))
+                        Console.Write("#");
+                    else
+                        Console.Write("_");
+                }
+                Console.WriteLine();
+            }*/
+            #endregion
+
+            HashSet<(int x, int y)> x = new HashSet<(int x, int y)>();
+
+            foreach (var item in map)
+                x.Add(item);
+
+            (int x, int y) aktSand = spawner;
+            int amountOfRestedSand = 0;
+            int finishline = map.Max(kk => kk.y) + 1;
+            while (true)
+            {
+                //end condition
+                if (aktSand.y == finishline)
+                    break;
+                //down
+                else if (!x.Contains((aktSand.x, aktSand.y + 1)))
+                    aktSand = (aktSand.x, aktSand.y + 1);
+                //downLeft
+                else if (!x.Contains((aktSand.x - 1, aktSand.y + 1)))
+                    aktSand = (aktSand.x - 1, aktSand.y + 1);
+                //downRight
+                else if (!x.Contains((aktSand.x + 1, aktSand.y + 1)))
+                    aktSand = (aktSand.x + 1, aktSand.y + 1);
+                else
+                {
+                    x.Add(aktSand);
+                    ++amountOfRestedSand;
+                    aktSand = spawner;
+                }
+            }
+            Console.WriteLine("Units of sand come to rest before sand starts flowing into the abyss below: " + amountOfRestedSand);
+
+            //2. rész
+
+            int floor = finishline + 1;
+
+            while (true)
+            {
+                //end condition
+                if (x.Contains(spawner))
+                    break;
+
+
+                //stop at floor
+                if(aktSand.y == floor - 1)
+                {
+                    x.Add(aktSand);
+                    ++amountOfRestedSand;
+                    aktSand = spawner;
+                }
+                //le
+                else if (!x.Contains((aktSand.x, aktSand.y + 1)))
+                    aktSand = (aktSand.x, aktSand.y + 1);
+                //balrale
+                else if (!x.Contains((aktSand.x - 1, aktSand.y + 1)))
+                    aktSand = (aktSand.x - 1, aktSand.y + 1);
+                //jobbrale
+                else if (!x.Contains((aktSand.x + 1, aktSand.y + 1)))
+                    aktSand = (aktSand.x + 1, aktSand.y + 1);
+                else
+                {
+                    x.Add(aktSand);
+                    ++amountOfRestedSand;
+                    aktSand = spawner;
+                }
+            }
+
+            Console.WriteLine("Units of sand before blocking the spawner: " + amountOfRestedSand);
+        }
+
+
         private static string concatStack(Stack<string> stack)
         {
             string solution = "";
@@ -1029,6 +1379,23 @@ namespace AdventOfCode2022
         }
 
         //for testing
+
+        private static void itemKiiras(Item a)
+        {
+            if (a.isList)
+            {
+                Console.Write("[");
+                foreach (var item in a.list)
+                {
+                    itemKiiras(item);
+                }
+                Console.Write("]");
+            }
+            else
+            {
+                Console.Write(a.value + ",");
+            }
+        }
 
         private static void kiirasKilencedik(List<(int x, int y)> headsAndTails)
         {
@@ -1118,6 +1485,15 @@ namespace AdventOfCode2022
                     break;
                 case 11:
                     Tizenegyedik();
+                    break;
+                case 12:
+                    Tizenkettedik();
+                    break;
+                case 13:
+                    Tizenharmadik();
+                    break;
+                case 14:
+                    Tizennegyedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");

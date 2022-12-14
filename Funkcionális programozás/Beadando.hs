@@ -50,7 +50,7 @@ tryPurchaseSegedKetto _ = 50
 
 tryPurchase :: GameModel -> Coordinate -> Plant -> Maybe GameModel
 tryPurchase (GameModel sun plantMap zombieMap) (x,y) plant
-    | (x >= 0 && x < 5 && y <= 0 && y < 12 && lookup (x,y) plantMap == Nothing && tryPurchaseSegedEgy sun plant) = Just (GameModel (sun - (tryPurchaseSegedKetto plant))  (((x,y), plant) : plantMap) zombieMap)
+    | (x >= 0 && x < 5 && y >= 0 && y < 12 && lookup (x,y) plantMap == Nothing && tryPurchaseSegedEgy sun plant) = Just (GameModel (sun - (tryPurchaseSegedKetto plant))  (((x,y), plant) : plantMap) zombieMap)
     | otherwise = Nothing
 
 placeZombieInLane :: GameModel -> Zombie -> Int -> Maybe GameModel
@@ -58,43 +58,74 @@ placeZombieInLane (GameModel sun plantMap zombieMap) zombie sav
     | (sav >= 0 && sav < 5 && lookup (sav, 11) zombieMap == Nothing) = Just (GameModel sun plantMap (((sav, 11), zombie): zombieMap))
     | otherwise = Nothing
 
---csökkenti a növény életét
-performZombieActionsSeged :: [(Coordinate, Plant)] -> [(Coordinate, Zombie)] -> [(Coordinate, Plant)]
-performZombieActionsSeged (((xP,yP), Peashooter x) : xs) zombieMap
-    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Peashooter x) : performZombieActionsSeged xs zombieMap
-    | otherwise = ((xP,yP), (Peashooter (x - 1))) : performZombieActionsSeged xs zombieMap
-performZombieActionsSeged (((xP,yP), Sunflower x) : xs) zombieMap
-    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Sunflower x) : performZombieActionsSeged xs zombieMap
-    | otherwise = ((xP,yP), (Sunflower (x - 1))) : performZombieActionsSeged xs zombieMap
-performZombieActionsSeged (((xP,yP), Walnut x) : xs) zombieMap
-    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), Walnut x) : performZombieActionsSeged xs zombieMap
-    | otherwise = ((xP,yP), (Walnut (x - 1))) : performZombieActionsSeged xs zombieMap
-performZombieActionsSeged (((xP,yP), CherryBomb x) : xs) zombieMap
-    | (lookup (xP, yP) zombieMap == Nothing) = ((xP,yP), CherryBomb x) : performZombieActionsSeged xs zombieMap
-    | otherwise = ((xP,yP), (CherryBomb (x - 1))) : performZombieActionsSeged xs zombieMap
-performZombieActionsSeged [] _ = []
-
 performZombieActions :: GameModel -> Maybe GameModel
-performZombieActions (GameModel sun plantMap zombieMap)
-    | (length (filter (\((xB,yB), zombieB) -> yB <= 0) zombieMap) > 0) = Nothing
-    | otherwise = Just (GameModel sun (performZombieActionsSeged plantMap (belsoseged zombieMap)) (belsoseged zombieMap)) where
-        belsoseged :: [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
-        belsoseged (((xC,yC), Vaulting z 2) : xs)
-            | (lookup (xC,yC) plantMap == Nothing && yC == 1) = ((xC,yC - 1), Vaulting z 2) : belsoseged xs
-            | (lookup (xC,yC) plantMap == Nothing) = ((xC,yC - 2), Vaulting z 2) : belsoseged xs
-            | (yC == 1) = ((xC,yC - 1), Vaulting z 1) : belsoseged xs
-            | otherwise = ((xC,yC - 2), Vaulting z 1) : belsoseged xs
-        belsoseged (((xC,yC), (Basic z x)) : xs)
-            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Basic z x)) : belsoseged xs
-            | otherwise = ((xC,yC), (Basic z x)) : belsoseged xs
-        belsoseged (((xC,yC), (Conehead z x)) : xs)
-            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Conehead z x)) : belsoseged xs
-            | otherwise = ((xC,yC), (Conehead z x)) : belsoseged xs
-        belsoseged (((xC,yC), (Buckethead z x)) : xs)
-            | ((lookup (xC,yC) plantMap == Nothing)) = ((xC,yC - x), (Buckethead z x)) : belsoseged xs
-            | otherwise = ((xC,yC), (Buckethead z x)) : belsoseged xs
-        belsoseged [] = []
+performZombieActions (GameModel sun plants zombies)
+    | (any (\((x,y),zombie) -> y == 0) zombies) = Nothing
+    | otherwise = Just (GameModel sun (hitPlants zombies plants) (changeZombiePosition plants zombies))
 
+
+hitPlants :: [(Coordinate, Zombie)] -> [(Coordinate, Plant)] -> [(Coordinate, Plant)]
+hitPlants [] plantMap = plantMap
+hitPlants ((coord, zombie):zombies) plantMap
+    | Basic x y <- zombie = hitPlants zombies (hitPlantAt coord plantMap) 
+    | Conehead x y <- zombie = hitPlants zombies (hitPlantAt coord plantMap)
+    | Buckethead x y <- zombie = hitPlants zombies (hitPlantAt coord plantMap)
+    | Vaulting x 1 <- zombie = hitPlants zombies (hitPlantAt coord plantMap)
+    | Vaulting x 2 <- zombie = hitPlants zombies plantMap
+
+hitPlantAt :: Coordinate -> [(Coordinate, Plant)] -> [(Coordinate, Plant)]
+hitPlantAt coord [] = []
+hitPlantAt coord ((coord2, plant):plants)
+    | coord == coord2 = ((coord2, hitPlantAtSeged plant):hitPlantAt coord plants)
+    | otherwise = ((coord2, plant):hitPlantAt coord plants)
+
+hitPlantAtSeged :: Plant -> Plant
+hitPlantAtSeged (Peashooter health) = Peashooter (health-1)
+hitPlantAtSeged (Sunflower health) = Sunflower (health-1)
+hitPlantAtSeged (Walnut health) = Walnut (health-1)
+hitPlantAtSeged (CherryBomb health) = CherryBomb (health-1)
+
+changeZombiePosition :: [(Coordinate, Plant)] -> [(Coordinate, Zombie)] -> [(Coordinate, Zombie)]
+changeZombiePosition plantMap zombiMap = map (\(coord, zombie) -> 
+    if (isVaultingWith2Speed zombie) 
+        then 
+            if isThereAPlantHere (fst coord, snd coord) plantMap 
+                then ((jumpShort (fst coord, snd coord)), Vaulting (getZombieHealth zombie) 1)
+            else if isThereAPlantHere (fst coord, snd coord-1) plantMap 
+                then ((jumpLong (fst coord, snd coord)), Vaulting (getZombieHealth zombie) 1)
+            else 
+                (jumpLong(fst coord, snd coord), zombie)
+    else if isThereAPlantHere coord plantMap
+        then (coord, zombie) 
+    else ((fst coord, snd coord - 1), zombie)) zombiMap
+
+isVaultingWith2Speed :: Zombie -> Bool
+isVaultingWith2Speed (Vaulting _ 2) = True
+isVaultingWith2Speed _ = False
+
+jumpShort :: Coordinate -> Coordinate
+jumpShort (x,y) 
+    | y-1 <= 0 = (x,0)
+    | otherwise = (x,y-1)
+
+jumpLong :: Coordinate -> Coordinate
+jumpLong (x,y) 
+    | y-2 <= 0 = (x,0)
+    | otherwise = (x,y-2)
+
+getZombieHealth :: Zombie -> Int
+getZombieHealth (Vaulting x _) = x
+getZombieHealth (Basic x _) = x
+getZombieHealth (Conehead x _) = x
+getZombieHealth (Buckethead x _) = x
+
+isThereAPlantHere :: Coordinate -> [(Coordinate, Plant)] -> Bool
+isThereAPlantHere coord [] = False
+isThereAPlantHere coord ((coord2, plant) : plants)
+    | (coord == coord2) = True
+    | otherwise = (isThereAPlantHere coord plants)
+
+{-
 cleanBoard :: GameModel -> GameModel
 cleanBoard (GameModel sun plantMap zombieMap) = (GameModel sun (plantCleaner plantMap) (zombieCleaner zombieMap)) where
     plantCleaner :: [(Coordinate, Plant)] -> [(Coordinate, Plant)]
@@ -110,7 +141,16 @@ cleanBoard (GameModel sun plantMap zombieMap) = (GameModel sun (plantCleaner pla
     zombieCleaner (((x,y), Buckethead 0 _) : xs) = zombieCleaner xs
     zombieCleaner (((x,y), Vaulting 0 _) : xs) = zombieCleaner xs
     zombieCleaner (x:xs) = x : zombieCleaner xs
-    zombieCleaner [] = []
+    zombieCleaner [] = []-}
+
+cleanBoard :: GameModel -> GameModel
+cleanBoard (GameModel sun plantMap zombieMap) = (GameModel sun (filter (\(_ , plant) -> getPlantHealth plant > 0) plantMap) (filter (\(_ , zombie) -> getZombieHealth zombie > 0) zombieMap)) where
+
+getPlantHealth :: Plant -> Int
+getPlantHealth (Peashooter x) = x
+getPlantHealth (Sunflower x) = x
+getPlantHealth (Walnut x) = x
+getPlantHealth( CherryBomb x) = x
 
 --Opcionális rész
 
