@@ -1246,10 +1246,9 @@ namespace AdventOfCode2022
 
         public static void Tizennegyedik()
         {
-
             //feltételezem, hogy mindig lehet homokot kreállni (nem lesz olyan, hogy be lesz zárva)
             //azt is, hogy akkor ér ki a homok, ha minden kőnél lejebb van (y kordinátája nagyobb mint akármelyik kőnek)
-            string[] s = File.ReadAllLines("tizennegyedikarpi.txt");
+            string[] s = File.ReadAllLines("tizennegyedik.txt");
 
             List<(int x, int y)> map = new List<(int x, int y)>();
             map.Add((-10, -10));
@@ -1368,6 +1367,904 @@ namespace AdventOfCode2022
             Console.WriteLine("Units of sand before blocking the spawner: " + amountOfRestedSand);
         }
 
+
+        class Sensor
+        {
+            public int Distance { get; set; }
+            public (int x, int y) BeaconPos { get; set; }
+            public (int x, int y) SensorPos { get; set; }
+            public Sensor((int x, int y) beacon, (int x, int y) sensor)
+            {
+                this.Distance = Math.Abs(sensor.x - beacon.x) + Math.Abs(sensor.y - beacon.y);
+                this.BeaconPos = beacon;
+                this.SensorPos = sensor;
+            }
+
+            public (int startX, int endX) HowManyAtYCoordinate(int y)
+            {
+                //there are Distance*2 + 1 at SensorPos.y
+                //after that it decreases by 2 every time
+
+                int distanceFromSensorOnYCoords = Math.Abs(SensorPos.y - y);
+
+                //if it's outside
+                if (distanceFromSensorOnYCoords > Distance)
+                    return (0, -1); //wont run the 'for' on it
+
+                //leftside first coord (startY) and on the right (endY)
+                int left = SensorPos.x - (Distance - distanceFromSensorOnYCoords);
+                int right = SensorPos.x + (Distance - distanceFromSensorOnYCoords);
+
+                //if it's inside
+                return (left, right);
+            }
+        }
+
+        public static void Tizenotodik()
+        {
+            string[] s = File.ReadAllLines("tizenotodik.txt");
+
+            List<Sensor> x = new List<Sensor>();
+
+            HashSet<(int x, int y)> uniqueBeacons = new HashSet<(int x, int y)>();
+
+            foreach (var item in s)
+            {
+                //from : Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+                //to : x=2, y=18 and x=-2, y=15
+                string[] temp = item.Split(':').Select(kk => kk.Substring(kk.IndexOf("at") + 3)).ToArray();
+                int[] tempSensor = temp[0].Split(',').Select(kk => int.Parse(kk.Substring(kk.IndexOf('=') + 1))).ToArray();
+                int[] tempBeacon = temp[1].Split(',').Select(kk => int.Parse(kk.Substring(kk.IndexOf('=') + 1))).ToArray();
+
+                x.Add(new Sensor((tempBeacon[0], tempBeacon[1]), (tempSensor[0], tempSensor[1])));
+
+                //doesn't add it if its already in
+                uniqueBeacons.Add((tempBeacon[0], tempBeacon[1]));
+            }
+
+            int sum = 0;
+            //used x map
+            HashSet<int> hash = new HashSet<int>();
+            foreach (var item in x)
+            {
+                (int startX, int endX) = item.HowManyAtYCoordinate(2000000);
+
+                for (int i = startX; i <= endX; i++)
+                {
+                    //if we already counted there
+                    if (hash.Contains(i))
+                        continue;
+
+                    ++sum;
+                    hash.Add(i);
+                }
+            }
+            Console.WriteLine("Positions that cannot contain a beacon at y=2000000 :" + (sum - uniqueBeacons.Count(kk => kk.y == 2000000)));
+
+            //2. rész
+
+            int alsoHatar = 0;
+            int felsoHatar = 4000000;
+
+            for (int i = 0; i < x.Count; i++)
+            {
+                bool meglett = false;
+                //körbejárjuk
+                (int x, int y) middle = x[i].SensorPos;
+                int distance = x[i].Distance + 1; //outside the diamond
+                //-x -> '0' -ig
+                //downLeft
+                int aktY = middle.y;
+                int mettol = middle.x - distance;
+                int meddig = middle.x;
+                for (int j = mettol; j < meddig; j++)
+                {
+                    bool itsCovered = false;
+                    for (int l = 0; l < x.Count; l++)
+                    {
+                        if (i == l)
+                            continue;
+
+                        if (Math.Abs(j - x[l].SensorPos.x) + Math.Abs(aktY - x[l].SensorPos.y) > x[l].Distance)
+                            continue;
+
+                        itsCovered = true;
+                        break;
+                    }
+
+                    if(!itsCovered && j >= alsoHatar && j <= felsoHatar && aktY >= alsoHatar && aktY <= felsoHatar)
+                    {
+                        Console.Write("Solution! " + j  + ", " + aktY + " | ");
+                        Console.WriteLine("It's tuning frequency is: " + ((j * (long)4000000) + aktY));
+                        meglett = true;
+                        break;
+                    }
+
+                    ++aktY;
+                }
+
+                if (meglett)
+                    break;
+
+                //downRight
+                aktY = middle.y + distance;
+                mettol = middle.x;
+                meddig = middle.x + distance;
+                for (int j = mettol; j < meddig; j++)
+                {
+                    bool itsCovered = false;
+                    for (int l = 0; l < x.Count; l++)
+                    {
+                        if (i == l)
+                            continue;
+
+                        if (Math.Abs(j - x[l].SensorPos.x) + Math.Abs(aktY - x[l].SensorPos.y) > x[l].Distance)
+                            continue;
+
+                        itsCovered = true;
+                        break;
+                    }
+
+                    if (!itsCovered && j >= alsoHatar && j <= felsoHatar && aktY >= alsoHatar && aktY <= felsoHatar)
+                    {
+                        Console.Write("Solution! " + j + ", " + aktY + " | ");
+                        Console.WriteLine("It's tuning frequency is: " + ((j * (long)4000000) + aktY));
+                        meglett = true;
+                        break;
+                    }
+
+                    --aktY;
+                }
+
+                if (meglett)
+                    break;
+
+                //upRight
+                aktY = middle.y;
+                mettol = middle.x + distance;
+                meddig = middle.x;
+                for (int j = mettol; j > meddig; j--)
+                {
+                    bool itsCovered = false;
+                    for (int l = 0; l < x.Count; l++)
+                    {
+                        if (i == l)
+                            continue;
+
+                        if (Math.Abs(j - x[l].SensorPos.x) + Math.Abs(aktY - x[l].SensorPos.y) > x[l].Distance)
+                            continue;
+
+                        itsCovered = true;
+                        break;
+                    }
+
+                    if (!itsCovered && j >= alsoHatar && j <= felsoHatar && aktY >= alsoHatar && aktY <= felsoHatar)
+                    {
+                        Console.Write("Solution! " + j + ", " + aktY + " | ");
+                        Console.WriteLine("It's tuning frequency is: " + ((j * (long)4000000) + aktY));
+                        meglett = true;
+                        break;
+                    }
+
+                    --aktY;
+                }
+
+                if (meglett)
+                    break;
+
+                //upLeft
+                aktY = middle.y - distance;
+                mettol = middle.x;
+                meddig = middle.x - distance;
+                for (int j = mettol; j > meddig; j--)
+                {
+                    bool itsCovered = false;
+                    for (int l = 0; l < x.Count; l++)
+                    {
+                        if (i == l)
+                            continue;
+
+                        if (Math.Abs(j - x[l].SensorPos.x) + Math.Abs(aktY - x[l].SensorPos.y) > x[l].Distance)
+                            continue;
+
+                        itsCovered = true;
+                        break;
+                    }
+
+                    if (!itsCovered && j >= alsoHatar && j <= felsoHatar && aktY >= alsoHatar && aktY <= felsoHatar)
+                    {
+                        Console.Write("Solution! " + j + ", " + aktY + " | ");
+                        Console.WriteLine("It's tuning frequency is: " + ((j * (long)4000000) + aktY));
+                        meglett = true;
+                        break;
+                    }
+
+                    ++aktY;
+                }
+
+                if (meglett)
+                    break;
+
+            }
+
+        }
+
+        public static void Tizenhatodik()  
+        {
+            string[] s = File.ReadAllLines("tizenhatodikarpi.txt");
+            Dictionary<string, (List<string> connections, int flow)> x = new Dictionary<string, (List<string> connections, int flow)>();
+            foreach (var item in s)
+            {
+                string name = item.Substring(6, 2);
+                int flow = int.Parse(item.Split(';').First().Substring(item.Split(';').First().IndexOf('=') + 1));
+
+                List<string> connections = new List<string>();
+                string[] temp = item.Split(' ');
+                for (int i = 9; i < temp.Length; i++)
+                    if(temp[i].Contains(','))
+                        connections.Add(temp[i].Remove(2).Trim());
+                    else
+                        connections.Add(temp[i].Trim());
+
+
+                x.Add(name, (connections, flow));
+            }
+
+            //gráfosabb
+            Dictionary<string, int> distBetweenEveryNode = new Dictionary<string, int>();
+            //AA -> BB (5 lépés) => "AABB", 5
+            foreach (var from in x)
+            {
+                //setup
+                Dictionary<string, int> dist = new Dictionary<string, int>();
+                foreach (var item in x)
+                    dist.Add(item.Key, int.MaxValue);
+
+                dist[from.Key] = 0;
+
+                Queue<string> q = new Queue<string>();
+                q.Enqueue(from.Key);
+
+                //actual algorithm
+                while (q.Count != 0)
+                {
+                    var temp = q.Dequeue();
+
+                    int nextDist = dist[temp] + 1;
+
+                    foreach (var item in x[temp].connections)
+                    {
+                        if (dist[item] <= nextDist)
+                            continue;
+
+                        q.Enqueue(item);
+                        dist[item] = nextDist;
+                    }
+                }
+
+                foreach (var item in dist)
+                {
+                    if (item.Key == from.Key || x[item.Key].flow == 0)
+                        continue;
+
+                    distBetweenEveryNode.Add(from.Key + item.Key, item.Value);
+                }
+            }
+
+            Dictionary<string, (List<string> connections, int flow)> nodes = new Dictionary<string, (List<string> connections, int flow)>();
+            foreach (var item in x)
+                if (item.Value.flow != 0)
+                    nodes.Add(item.Key, item.Value);
+
+            Console.WriteLine("The most pressure I can release: " + TizenhatodikOkosabbRek("AA",distBetweenEveryNode,new HashSet<string>(),0,0,nodes,30));
+
+            //2. rész
+
+            //Main idea:
+            //First I go, then the elephant, but it cant collect the same things me
+
+            Console.WriteLine("With you and an elephant working together for 26 minutes: " + TizenhatodikMasodikReszOkosabbRek("AA", distBetweenEveryNode, new HashSet<string>(), 0, 0, nodes, 26));
+            
+            //Túl lassú
+            //Console.WriteLine("With you and an elephant working together for 26 minutes: " + TizenhatodikMasodikReszRek("AA", "AA", distBetweenEveryNode, new HashSet<string>(), 0, 0, 0, nodes, 26,26));
+        }
+        /*
+        //for a DP solution:
+        public static Dictionary<long, int> tizenhatodikDP = new Dictionary<long, int>();*/
+        public static int TizenhatodikOkosabbRek(string aktElem, Dictionary<string,int> dist, HashSet<string> nyitott, int flowPerMinute, int flowSum, Dictionary<string, (List<string> connections, int flow)> nodes, int time)
+        {
+            int max = 0;
+            foreach (var item in nodes)
+            {
+                if (item.Key == aktElem || nyitott.Contains(item.Key) || time - dist[aktElem + item.Key] - 1 < 0)
+                    continue;
+
+                nyitott.Add(item.Key);
+                int temp = TizenhatodikOkosabbRek(item.Key, dist, nyitott, flowPerMinute + item.Value.flow, flowSum + flowPerMinute * (dist[aktElem + item.Key] + 1), nodes, time - (dist[aktElem + item.Key] + 1));
+                nyitott.Remove(item.Key);
+                if (temp > max)
+                    max = temp;
+            }
+
+            if(max == 0)
+                return flowSum + (flowPerMinute * time);
+
+            return max;
+        }
+
+        //nem használjuk
+        public static int TizenhatodikMasodikReszRek(string aktElem, string elefantAktElem, Dictionary<string, int> dist, HashSet<string> nyitott, int flowPerMinute, int flowPerMinuteElefant, int flowSum, Dictionary<string, (List<string> connections, int flow)> nodes, int time, int timeElefant)
+        {
+            List<int> maxValues = new List<int>() { 0 };
+            foreach (var item in nodes)
+            {
+                if (nyitott.Contains(item.Key))
+                    continue;
+
+                nyitott.Add(item.Key);
+
+                if (item.Key != aktElem && time - dist[aktElem + item.Key] - 1 >= 0)
+                    maxValues.Add(TizenhatodikMasodikReszRek(item.Key, elefantAktElem, dist, nyitott, flowPerMinute + item.Value.flow, flowPerMinuteElefant, flowSum + flowPerMinute * (dist[aktElem + item.Key] + 1), nodes, time - (dist[aktElem + item.Key] + 1), timeElefant));
+                
+                if (item.Key != elefantAktElem && timeElefant - dist[elefantAktElem + item.Key] - 1 >= 0)
+                    maxValues.Add(TizenhatodikMasodikReszRek(aktElem, item.Key, dist, nyitott, flowPerMinute, flowPerMinuteElefant + item.Value.flow, flowSum + flowPerMinuteElefant * (dist[elefantAktElem + item.Key] + 1), nodes, time ,timeElefant - (dist[elefantAktElem + item.Key] + 1)));
+                
+                nyitott.Remove(item.Key);
+            }
+
+            if (maxValues.Count == 1)
+                maxValues.Add(flowSum + (flowPerMinute * time) + (flowPerMinuteElefant * timeElefant));
+
+            return maxValues.Max();
+        }
+        
+        public static int TizenhatodikMasodikReszOkosabbRek(string aktElem, Dictionary<string, int> dist, HashSet<string> nyitott, int flowPerMinute, int flowSum, Dictionary<string, (List<string> connections, int flow)> nodes, int time)
+        {
+            int max = 0;
+            foreach (var item in nodes)
+            {
+                if (nyitott.Contains(item.Key) || item.Key == aktElem || time - dist[aktElem + item.Key] - 1 < 0)
+                    continue;
+
+                nyitott.Add(item.Key);
+                //én megyek
+                int temp = TizenhatodikMasodikReszOkosabbRek(item.Key, dist, nyitott, flowPerMinute + item.Value.flow, flowSum + flowPerMinute * (dist[aktElem + item.Key] + 1), nodes, time - (dist[aktElem + item.Key] + 1));
+
+                //elefánt része
+                int temp2 = TizenhatodikOkosabbRek("AA", dist, nyitott, 0, 0, nodes, 26);
+                //én eddigi cuccom:
+                temp2 += flowSum + (flowPerMinute * (dist[aktElem + item.Key] + 1)) //maradék idő az úton át
+                    + ((flowPerMinute + item.Value.flow) * (time - dist[aktElem + item.Key] - 1)); //miután odaértem a végéig
+
+                nyitott.Remove(item.Key);
+
+                if (temp2 > temp)
+                    temp = temp2;
+
+                if (temp > max)
+                    max = temp;
+            }
+
+            int temp3 = flowSum +(flowPerMinute * time);
+
+            if (temp3 > max)
+                return temp3;
+
+            return max;
+        }
+
+        class Ko
+        {
+            public int szelesseg { get; set; }
+            public int magassag { get; set; }
+            public (int x, int y) position { get; set; }
+            public HashSet<(int x, int y)> body { get; set; }
+
+            public Ko((int x, int y) pos, HashSet<(int x, int y)> body)
+            {
+                this.position = pos;
+                this.body = body;
+                szelesseg = 1 + body.Max(kk => kk.x);
+                magassag = 1 - body.Min(kk => kk.y);
+            }
+
+            public Ko(Ko a)
+            {
+                this.position = a.position;
+                this.body = new HashSet<(int x, int y)>(a.body);
+                szelesseg = 1 + body.Max(kk => kk.x);
+                magassag = 1 - body.Min(kk => kk.y);
+            }
+
+            public bool isColliding(HashSet<(int x, int y)> a)
+            {
+                return body.Any(kk => a.Contains((kk.x + position.x, kk.y + position.y)));
+            }
+
+            public IEnumerable<(int x, int y)> actualPositions ()
+            {
+                return body.Select(kk => (kk.x + position.x, kk.y + position.y));
+            }
+        }
+
+        class State
+        {
+            public int whichRock { get; set; }
+            public int heightWhenAdded { get; set; }
+            public int wind { get; set; }
+
+            //last 100 rows:
+            //top contains the topmost positions per x coordinate, relative to the smallest one
+            public HashSet<int> top { get; set; } //HashSet better for this, by design see: .SetEquals()
+
+            public State(int rockIndex, int height, int windIndex, List<int> top)
+            {
+                whichRock = rockIndex;
+                heightWhenAdded = height;
+                wind = windIndex;
+                this.top = new HashSet<int>(top);
+            }
+
+            public static bool operator ==(State a, State b)
+            {
+                return a.whichRock == b.whichRock
+                    && a.wind == b.wind
+                    && a.top.SetEquals(b.top);
+            }
+            public static bool operator !=(State a, State b)
+            {
+                return !(a == b);
+            }
+
+            //overriding default equals check
+            public override bool Equals(object obj)
+            {
+                if (obj == null || !this.GetType().Equals(obj.GetType()))
+                    return false;
+
+                State a = (State)obj;
+                return this == a;
+            }
+            //overriding it's HashCode
+            //Probably won't need it
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(whichRock, wind, top);
+            }
+        }
+
+        public static void Tizenhetedik()
+        {
+            int[] s = File.ReadAllLines("tizenhetedik.txt").First().Select(kk => kk - 61).ToArray();
+
+            HashSet<(int x, int y)> cords = new HashSet<(int x, int y)>();
+            for (int i = 0; i < 7; i++)
+                cords.Add((i, 0));
+
+            //szimulálós
+            List<Ko> otKo = new List<Ko>();
+            otKo.Add(new Ko((0, 0), new HashSet<(int x, int y)>() { (0, 0), (1, 0), (2, 0), (3, 0) })); //####
+            otKo.Add(new Ko((0, 0), new HashSet<(int x, int y)>() { (1, 0), (0, -1), (1, -1), (2, -1), (1,-2) })); //+
+            otKo.Add(new Ko((0, 0), new HashSet<(int x, int y)>() { (2, 0), (2, -1), (0, -2), (1, -2), (2,-2) })); //fordított L
+            otKo.Add(new Ko((0, 0), new HashSet<(int x, int y)>() { (0, 0), (0, -1), (0, -2), (0, -3)})); //I
+            otKo.Add(new Ko((0, 0), new HashSet<(int x, int y)>() { (0, 0), (1, 0), (0, -1), (1, -1)})); //negyzet
+
+            int legmagasabbY = 0;
+
+            long kovek = 0;
+            int szel = 0;
+
+            while (kovek < 2022)
+            {
+                //Console.Write($"\r{Math.Round(kovek/2022.0 * 100)}%   " );
+
+                Ko aktKo = new Ko(otKo[(int)(kovek % 5)]);
+
+                aktKo.position = (2, legmagasabbY + 4 + Math.Abs(aktKo.body.Min(kk => kk.y)));
+
+                while(!aktKo.isColliding(cords))
+                {
+                    int xhova = aktKo.position.x + s[szel % s.Length];
+                    if (xhova >= 0 && xhova + aktKo.szelesseg - 1 <= 6)
+                    {
+                        aktKo.position = (xhova, aktKo.position.y);
+                        if (aktKo.isColliding(cords))
+                        {
+                            aktKo.position = (aktKo.position.x - s[szel % s.Length], aktKo.position.y - 1);
+                            ++szel;
+                            continue;
+                        }
+                    }
+                    aktKo.position = (aktKo.position.x, aktKo.position.y - 1);
+
+                    ++szel;
+                }
+
+                aktKo.position = (aktKo.position.x, aktKo.position.y + 1);
+
+                IEnumerable<(int x, int y)> realWolrdCords = aktKo.actualPositions();
+                int maxY = realWolrdCords.Max(kk => kk.y);
+
+                if (maxY > legmagasabbY)
+                    legmagasabbY = maxY;
+
+                foreach (var item in realWolrdCords)
+                    cords.Add(item);
+
+                ++kovek;
+            }
+
+
+            //Console.WriteLine();
+            Console.WriteLine(cords.Max(kk => kk.y));
+
+            //2. rész
+
+            cords = new HashSet<(int x, int y)>();
+            for (int i = 0; i < 7; i++)
+                cords.Add((i, 0));
+
+            legmagasabbY = 0;
+
+            kovek = 0;
+            szel = 0;
+
+            //new things:
+            List<int> top = new List<int>();
+            for (int i = 0; i < 7; i++)
+                top.Add(0);
+
+            List<State> states = new List<State>();
+
+            while (kovek < 1000000000000)
+            {
+                //Console.Write($"\r{Math.Round(kovek/2022.0 * 100)}%   " );
+
+                Ko aktKo = new Ko(otKo[(int)(kovek % 5)]);
+
+                aktKo.position = (2, legmagasabbY + 4 + Math.Abs(aktKo.body.Min(kk => kk.y)));
+
+                State newstate = new State((int)(kovek % 5), legmagasabbY, szel % s.Length, top);
+
+                foreach (var item in states)
+                {
+                    if (item != newstate)
+                        continue;
+
+                    Console.WriteLine("Megvan!!!!");
+                    break;
+                }
+
+                while (!aktKo.isColliding(cords))
+                {
+                    int xhova = aktKo.position.x + s[szel % s.Length];
+                    if (xhova >= 0 && xhova + aktKo.szelesseg - 1 <= 6)
+                    {
+                        aktKo.position = (xhova, aktKo.position.y);
+                        if (aktKo.isColliding(cords))
+                        {
+                            aktKo.position = (aktKo.position.x - s[szel % s.Length], aktKo.position.y - 1);
+                            ++szel;
+                            continue;
+                        }
+                    }
+                    aktKo.position = (aktKo.position.x, aktKo.position.y - 1);
+
+                    ++szel;
+                }
+
+                aktKo.position = (aktKo.position.x, aktKo.position.y + 1);
+
+                IEnumerable<(int x, int y)> realWolrdCords = aktKo.actualPositions();
+                int maxY = realWolrdCords.Max(kk => kk.y);
+
+                //top update:
+                int minBody = aktKo.body.Min(kk => kk.y);
+                foreach (var item in aktKo.body)
+                    if (top[item.x + aktKo.position.x] < item.y + minBody)
+                        top[item.x + aktKo.position.x] = item.y + minBody;
+
+                //then make 'top' relative:
+
+
+                if (maxY > legmagasabbY)
+                    legmagasabbY = maxY;
+
+                foreach (var item in realWolrdCords)
+                    cords.Add(item);
+
+                ++kovek;
+            }
+
+        }
+
+        class Side
+        {
+            public (int x, int y, int z) position { get; set; }
+            public char paralelAxis { get; set; }
+            public Side((int x, int y, int z) Cord, char axis)
+            {
+                position = Cord;
+                paralelAxis = axis;
+            }
+
+            public static bool operator ==(Side a, Side b)
+            {
+                return a.position == b.position
+                    && a.paralelAxis == b.paralelAxis;
+            }
+            
+            public static bool operator !=(Side a, Side b)
+            {
+                return !(a == b);
+            }
+
+            //overriding default equals check
+            public override bool Equals(object obj)
+            {
+                if (obj == null || !this.GetType().Equals(obj.GetType()))
+                    return false;
+
+                Side a = (Side)obj;
+                return this == a;
+            }
+            //overriding it's HashCode
+            //Probably won't need it
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(position, paralelAxis);
+            }
+        }
+
+        public static void Tizennyolcadik()
+        {
+            string[] s = File.ReadAllLines("tizennyolcadikproba.txt");
+            //s = new string[] { "1,1,1", "2,1,1" };
+            HashSet<Side> sides = new HashSet<Side>();
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(',');
+                int x = int.Parse(temp[0]);
+                int y = int.Parse(temp[1]);
+                int z = int.Parse(temp[2]);
+
+                //there are 6 sides:
+                //x:
+                Side actSide = new Side((x, y, z), 'x');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+                //x-2:
+                actSide = new Side((x, y, z - 1), 'x');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+                //y:
+                actSide = new Side((x + 1, y, z), 'y');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+                //y-2:
+                actSide = new Side((x, y, z), 'y');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+                //z:
+                actSide = new Side((x, y, z), 'z');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+                //z-2:
+                actSide = new Side((x, y + 1, z), 'z');
+                if (!sides.Remove(actSide))
+                    sides.Add(actSide);
+            }
+            Console.WriteLine("The surface area of my scanned lava droplet: " + sides.Count);
+
+            //2. feladat
+            /*
+            int eredmeny = sides.Count; //1. feladatból
+
+            int legkisebbX = sides.Min(kk => kk.position.x) - 10;
+            int legnagyobbX = sides.Max(kk => kk.position.x) + 10;
+            int legkisebbY = sides.Min(kk => kk.position.y) - 10;
+            int legnagyobbY = sides.Max(kk => kk.position.y) + 10;
+            int legkisebbZ = sides.Min(kk => kk.position.z) - 10;
+            int legnagyobbZ = sides.Max(kk => kk.position.z) + 10;
+            */
+
+            //valahogy végig kell menni a shape' oldalain, ahogy connectelnek, lehet gráfosan
+
+            //1. elem a külsején kéne legyen
+            int legkisebbZ = sides.Min(kk => kk.position.z);
+            Side elso = sides.Where(kk => kk.paralelAxis == 'x' && kk.position.z == legkisebbZ).First();
+
+            HashSet<Side> kulsok = new HashSet<Side>();
+            Queue<Side> q = new Queue<Side>();
+            q.Enqueue(elso);
+
+            while (q.Count != 0)
+            {
+                Side actSide = q.Dequeue();
+                kulsok.Add(actSide);
+
+                //neighbor check
+                //12 lesz összesen
+
+                //felfelé hajlók
+
+                //hosszabbítások
+                Side x1 = new Side((actSide.position.x + 1, actSide.position.y, actSide.position.z), actSide.paralelAxis);
+                Side x2 = new Side((actSide.position.x, actSide.position.y + 1, actSide.position.z), actSide.paralelAxis);
+                Side x3 = new Side((actSide.position.x - 1, actSide.position.y, actSide.position.z), actSide.paralelAxis);
+                Side x4 = new Side((actSide.position.x, actSide.position.y - 1, actSide.position.z), actSide.paralelAxis);
+
+            }
+        }
+
+        public class Blueprint
+        {
+            public int maxOreCost { get; set; }
+            public int maxClayCost { get; set; }
+            public int maxObsidianCost { get; set; }
+
+
+
+            public int oreCount = 0;
+            public int clayCount = 0;
+            public int obsidianCount = 0;
+            public int geodeCount = 0;
+
+            public int orePerMinute = 1;
+            public int clayPerMinute = 0;
+            public int obsidianPerMinute = 0;
+            public int geodePerMinute = 0;
+
+            public int blueprintnumber { get; set; }
+            public int oreRobotCost { get; set; }
+            public int clayRobotCost { get; set; }
+            public (int ore, int clay) obsidianRobotCost { get; set; }
+            public (int ore, int obsidian) geodeRobotCost { get; set; }
+
+            public Blueprint(int blueprint, int oreRobot, int clayRobot, (int ore, int clay) obsidianRobot, (int ore, int clay) geodeRobot)
+            {
+                blueprintnumber = blueprint;
+                oreRobotCost = oreRobot;
+                clayRobotCost = clayRobot;
+                obsidianRobotCost = obsidianRobot;
+                geodeRobotCost = geodeRobot;
+
+                maxOreCost = Math.Max(Math.Max(oreRobotCost, clayRobotCost), Math.Max(obsidianRobotCost.ore, geodeRobotCost.ore));
+                maxClayCost = obsidianRobotCost.clay;
+                maxObsidianCost = geodeRobotCost.obsidian;
+            }
+
+            public void Update()
+            {
+                oreCount += orePerMinute;
+                clayCount += clayPerMinute;
+                obsidianCount += obsidianPerMinute;
+                geodeCount += geodePerMinute;
+            }
+            public void ReverseUpdate()
+            {
+                oreCount -= orePerMinute;
+                clayCount -= clayPerMinute;
+                obsidianCount -= obsidianPerMinute;
+                geodeCount -= geodePerMinute;
+            }
+        }
+
+        public static void tizenKilencedik()
+        {
+            string[] s = File.ReadAllLines("tizenkilencedikproba.txt");
+
+            List<Blueprint> x = new List<Blueprint>();
+
+            foreach (var item in s)
+            {
+                string[] temp = item.Split('.');
+                int blueprintnumber = int.Parse(temp[0].Split(':').First().Split(' ').Last());
+                int oreRobotCost = int.Parse(temp[0].Split(' ')[6]);
+                int clayRobotCost = int.Parse(temp[1].Trim().Split(' ')[4]);
+                int obsidianRobotOreCost = int.Parse(temp[2].Trim().Split(' ')[4]);
+                int obsidianRobotClayCost = int.Parse(temp[2].Trim().Split(' ')[7]);
+                int geodeRobotOreCost = int.Parse(temp[3].Trim().Split(' ')[4]);
+                int geodeRobotClayCost = int.Parse(temp[3].Trim().Split(' ')[7]);
+
+                x.Add(new Blueprint(x.Count + 1, oreRobotCost, clayRobotCost, (obsidianRobotOreCost, obsidianRobotClayCost), (geodeRobotOreCost, geodeRobotClayCost)));
+            }
+
+            //gondolom rekurzió
+            foreach (var item in x)
+            {
+                Console.WriteLine(TizenkilencedikRek(item,24));
+                break;
+            }
+        }
+
+        public static int TizenkilencedikRek(Blueprint bp, int timeLeft)
+        {
+            if (timeLeft == 0)
+                return bp.geodeCount;
+
+            int max = 0;
+            //termelés:
+            bp.Update();
+
+            //olda values
+            int oldOreCount = bp.oreCount;
+            int oldClayCount = bp.clayCount;
+            int oldObsidianCount = bp.obsidianCount;
+            int oldGeodeCount = bp.geodeCount;
+
+            //oreRobot
+            if (bp.orePerMinute <= bp.maxOreCost && bp.oreCount >= bp.oreRobotCost)
+            {
+                bp.oreCount -= bp.oreRobotCost;
+                ++bp.orePerMinute;
+
+                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+
+                --bp.orePerMinute;
+                bp.oreCount = oldOreCount;
+
+                if (temp > max)
+                    max = temp;
+            }
+            //clay
+            if (bp.clayPerMinute <= bp.maxClayCost && bp.oreCount >= bp.clayRobotCost)
+            {
+                bp.oreCount -= bp.clayRobotCost;
+                ++bp.clayPerMinute;
+
+                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+
+                --bp.clayPerMinute;
+                bp.clayCount = oldClayCount;
+                bp.oreCount = oldOreCount;
+
+                if (temp > max)
+                    max = temp;
+            }
+            //obsidian
+            if (bp.obsidianPerMinute <= bp.maxObsidianCost && bp.oreCount >= bp.obsidianRobotCost.ore && bp.clayCount >= bp.obsidianRobotCost.clay)
+            {
+                bp.oreCount -= bp.obsidianRobotCost.ore;
+                bp.clayCount -= bp.obsidianRobotCost.clay;
+                ++bp.obsidianPerMinute;
+
+                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+
+                --bp.obsidianPerMinute;
+                bp.clayCount = oldClayCount;
+                bp.oreCount = oldOreCount;
+                bp.obsidianCount = oldObsidianCount;
+
+                if (temp > max)
+                    max = temp;
+            }
+            //geode
+            if (bp.oreCount >= bp.geodeRobotCost.ore && bp.obsidianCount >= bp.geodeRobotCost.obsidian)
+            {
+                bp.oreCount -= bp.geodeRobotCost.ore;
+                bp.obsidianCount -= bp.geodeRobotCost.obsidian;
+                ++bp.geodePerMinute;
+
+                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+
+                bp.geodeCount = 
+                --bp.geodePerMinute;
+                bp.oreCount = oldOreCount;
+                bp.obsidianCount = oldObsidianCount;
+                bp.geodeCount = oldGeodeCount;
+
+                if (temp > max)
+                    max = temp;
+            }
+
+            int noAction = TizenkilencedikRek(bp, timeLeft - 1);
+
+            if (noAction > max)
+                return noAction;
+
+            return max;
+        }
 
         private static string concatStack(Stack<string> stack)
         {
@@ -1494,6 +2391,21 @@ namespace AdventOfCode2022
                     break;
                 case 14:
                     Tizennegyedik();
+                    break;
+                case 15:
+                    Tizenotodik();
+                    break;
+                case 16:
+                    Tizenhatodik();
+                    break;
+                case 17:
+                    Tizenhetedik();
+                    break;
+                case 18:
+                    Tizennyolcadik();
+                    break;
+                case 19:
+                    tizenKilencedik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");
