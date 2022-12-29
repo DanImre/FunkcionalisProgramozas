@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-const int n = 30; //hallgatók zsáma
+int n = 30; //hallgatók zsáma
 
 typedef enum tipus //hallgatók típusa
 {
