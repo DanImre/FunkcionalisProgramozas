@@ -14,11 +14,10 @@ namespace ConsoleApp1
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            string filename = "be1.txt";
+        public static string filename = "be1.txt";
 
-            //beolvasás
+        public static (List<List<int>> x,int n,int m) beovasas()
+        {
             int n = 0;
             int m = 0;
             List<List<int>> x = new List<List<int>>();
@@ -75,6 +74,12 @@ namespace ConsoleApp1
                     x.Add(s);
                 }
             }
+
+            return (x,n,m);
+        }
+
+        public static int feladat(List<List<int>> x, int n, int m)
+        {
             //feladat
             double max = 0;
             int maxi = -1;
@@ -93,8 +98,17 @@ namespace ConsoleApp1
                 maxi = i;
             }
 
+            return maxi + 1;
+        }
+
+        static void Main(string[] args)
+        {
+            var temp = beovasas();
+
+            int solution = feladat(temp.x, temp.n, temp.m);
+
             //Console.WriteLine("Atlagosan legmelegebb nap: " + (maxi + 1));
-            Console.WriteLine((maxi + 1));
+            Console.WriteLine(solution);
         }
     }
 }

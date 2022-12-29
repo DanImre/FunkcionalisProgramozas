@@ -2103,8 +2103,6 @@ namespace AdventOfCode2022
             public int maxClayCost { get; set; }
             public int maxObsidianCost { get; set; }
 
-
-
             public int oreCount = 0;
             public int clayCount = 0;
             public int obsidianCount = 0;
@@ -2150,120 +2148,1492 @@ namespace AdventOfCode2022
             }
         }
 
-        public static void tizenKilencedik()
+        public static void TizenKilencedik()
         {
-            string[] s = File.ReadAllLines("tizenkilencedikproba.txt");
+            string[] s = File.ReadAllLines("tizenkilencedik.txt");
 
             List<Blueprint> x = new List<Blueprint>();
 
             foreach (var item in s)
             {
                 string[] temp = item.Split('.');
-                int blueprintnumber = int.Parse(temp[0].Split(':').First().Split(' ').Last());
                 int oreRobotCost = int.Parse(temp[0].Split(' ')[6]);
                 int clayRobotCost = int.Parse(temp[1].Trim().Split(' ')[4]);
                 int obsidianRobotOreCost = int.Parse(temp[2].Trim().Split(' ')[4]);
                 int obsidianRobotClayCost = int.Parse(temp[2].Trim().Split(' ')[7]);
                 int geodeRobotOreCost = int.Parse(temp[3].Trim().Split(' ')[4]);
-                int geodeRobotClayCost = int.Parse(temp[3].Trim().Split(' ')[7]);
+                int geodeRobotObsidianCost = int.Parse(temp[3].Trim().Split(' ')[7]);
 
-                x.Add(new Blueprint(x.Count + 1, oreRobotCost, clayRobotCost, (obsidianRobotOreCost, obsidianRobotClayCost), (geodeRobotOreCost, geodeRobotClayCost)));
+                x.Add(new Blueprint(x.Count + 1, oreRobotCost, clayRobotCost, (obsidianRobotOreCost, obsidianRobotClayCost), (geodeRobotOreCost, geodeRobotObsidianCost)));
             }
 
-            //gondolom rekurzió
+            long total = 0;
             foreach (var item in x)
-            {
-                Console.WriteLine(TizenkilencedikRek(item,24));
-                break;
-            }
+                total += item.blueprintnumber * TizenkilencedikJobbRek(item, new Dictionary<(int, int, int, int, int, int, int, int, int), int>(), 24);
+
+            Console.WriteLine("What do you get if you add up the quality level of all of the blueprints in your list? " + total);
+
+            //2. rész
+            total = 1;
+            foreach (var item in x.Take(3))
+                total *= TizenkilencedikJobbRek(item, new Dictionary<(int, int, int, int, int, int, int, int, int), int>(), 32);
+
+            Console.WriteLine("What do you get if you multiply the maximum geodes per blueprint together? " + total);
         }
 
-        public static int TizenkilencedikRek(Blueprint bp, int timeLeft)
+        public static int TizenkilencedikJobbRek(Blueprint bp, Dictionary<(int, int, int, int, int, int, int, int, int), int> cache, int time)
         {
-            if (timeLeft == 0)
+            if (time == 0)
                 return bp.geodeCount;
 
-            int max = 0;
-            //termelés:
-            bp.Update();
+            var key = (time, bp.orePerMinute, bp.clayPerMinute, bp.obsidianPerMinute, bp.geodePerMinute, bp.oreCount, bp.clayCount, bp.obsidianCount, bp.geodeCount);
+            if (cache.ContainsKey(key))
+                return cache[key];
 
-            //olda values
+            //Semmit tevés
+            int max = bp.geodeCount + bp.geodePerMinute * time;
+
             int oldOreCount = bp.oreCount;
             int oldClayCount = bp.clayCount;
             int oldObsidianCount = bp.obsidianCount;
             int oldGeodeCount = bp.geodeCount;
 
             //oreRobot
-            if (bp.orePerMinute <= bp.maxOreCost && bp.oreCount >= bp.oreRobotCost)
+            if (bp.maxOreCost > bp.orePerMinute) //még nincs annyi, amennyit el tudunk kolteni
             {
-                bp.oreCount -= bp.oreRobotCost;
-                ++bp.orePerMinute;
+                int timeToWaitUntilItsBuilt = (int)Math.Ceiling((bp.oreRobotCost - bp.oreCount) / (double)bp.orePerMinute);
 
-                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+                if (timeToWaitUntilItsBuilt < 0)
+                    timeToWaitUntilItsBuilt = 0;
 
-                --bp.orePerMinute;
-                bp.oreCount = oldOreCount;
+                int timeRemaining = time - timeToWaitUntilItsBuilt - 1;
+                if (timeRemaining > 0)
+                {
+                    //Nem tárolunk többet, mint amennyit fel tudnánk használni (cache miatt)
+                    bp.oreCount = Math.Min(bp.oreCount + bp.orePerMinute * (timeToWaitUntilItsBuilt + 1) - bp.oreRobotCost, timeRemaining * bp.maxOreCost);
+                    bp.clayCount = Math.Min(bp.clayCount + bp.clayPerMinute * (timeToWaitUntilItsBuilt + 1), timeRemaining * bp.maxClayCost);
+                    bp.obsidianCount = Math.Min(bp.obsidianCount + bp.obsidianPerMinute * (timeToWaitUntilItsBuilt + 1), timeRemaining * bp.maxObsidianCost);
+                    bp.geodeCount += bp.geodePerMinute * (timeToWaitUntilItsBuilt + 1);
+                    ++bp.orePerMinute;
 
-                if (temp > max)
-                    max = temp;
+                    int temp = TizenkilencedikJobbRek(bp, cache, timeRemaining);
+                    if (temp > max)
+                        max = temp;
+
+                    --bp.orePerMinute;
+                    bp.oreCount = oldOreCount;
+                    bp.clayCount = oldClayCount;
+                    bp.obsidianCount = oldObsidianCount;
+                    bp.geodeCount = oldGeodeCount;
+                }
             }
-            //clay
-            if (bp.clayPerMinute <= bp.maxClayCost && bp.oreCount >= bp.clayRobotCost)
+            //clayRobot
+            if (bp.maxClayCost > bp.clayPerMinute) //még nincs annyi, amennyit el tudunk kolteni
             {
-                bp.oreCount -= bp.clayRobotCost;
-                ++bp.clayPerMinute;
+                int timeToWaitUntilItsBuilt = (int)Math.Ceiling((bp.clayRobotCost - bp.oreCount) / (double)bp.orePerMinute);
 
-                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+                if (timeToWaitUntilItsBuilt < 0)
+                    timeToWaitUntilItsBuilt = 0;
 
-                --bp.clayPerMinute;
-                bp.clayCount = oldClayCount;
-                bp.oreCount = oldOreCount;
+                int timeRemaining = time - timeToWaitUntilItsBuilt - 1;
+                if (timeRemaining > 0)
+                {
+                    //Nem tárolunk többet, mint amennyit fel tudnánk használni (cache miatt)
+                    bp.oreCount = Math.Min(bp.oreCount + bp.orePerMinute * (timeToWaitUntilItsBuilt + 1) - bp.clayRobotCost, timeRemaining * bp.maxOreCost);
+                    bp.clayCount = Math.Min(bp.clayCount + bp.clayPerMinute * (timeToWaitUntilItsBuilt + 1), timeRemaining * bp.maxClayCost);
+                    bp.obsidianCount = Math.Min(bp.obsidianCount + bp.obsidianPerMinute * (timeToWaitUntilItsBuilt + 1), timeRemaining * bp.maxObsidianCost);
+                    bp.geodeCount += bp.geodePerMinute * (timeToWaitUntilItsBuilt + 1);
+                    ++bp.clayPerMinute;
 
-                if (temp > max)
-                    max = temp;
+                    int temp = TizenkilencedikJobbRek(bp, cache, timeRemaining);
+                    if (temp > max)
+                        max = temp;
+                    
+                    --bp.clayPerMinute;
+                    bp.oreCount = oldOreCount;
+                    bp.clayCount = oldClayCount;
+                    bp.obsidianCount = oldObsidianCount;
+                    bp.geodeCount = oldGeodeCount;
+                }
             }
-            //obsidian
-            if (bp.obsidianPerMinute <= bp.maxObsidianCost && bp.oreCount >= bp.obsidianRobotCost.ore && bp.clayCount >= bp.obsidianRobotCost.clay)
+            //obsidianRobot
+            if (bp.clayPerMinute != 0 && bp.maxObsidianCost > bp.obsidianPerMinute) //még nincs annyi, amennyit el tudunk kolteni
             {
-                bp.oreCount -= bp.obsidianRobotCost.ore;
-                bp.clayCount -= bp.obsidianRobotCost.clay;
-                ++bp.obsidianPerMinute;
+                int timeToWaitUntilItsBuilt = Math.Max((int)Math.Ceiling((bp.obsidianRobotCost.clay - bp.clayCount) / (double)bp.clayPerMinute), (int)Math.Ceiling((bp.obsidianRobotCost.ore - bp.oreCount) / (double)bp.orePerMinute));
 
-                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+                if (timeToWaitUntilItsBuilt < 0)
+                    timeToWaitUntilItsBuilt = 0;
 
-                --bp.obsidianPerMinute;
-                bp.clayCount = oldClayCount;
-                bp.oreCount = oldOreCount;
-                bp.obsidianCount = oldObsidianCount;
+                int timeRemaining = time - timeToWaitUntilItsBuilt - 1;
+                if (timeRemaining > 0)
+                {
+                    //Nem tárolunk többet, mint amennyit fel tudnánk használni (cache miatt)
+                    bp.oreCount = Math.Min(bp.oreCount + bp.orePerMinute * (timeToWaitUntilItsBuilt + 1) - bp.obsidianRobotCost.ore, timeRemaining * bp.maxOreCost);
+                    bp.clayCount = Math.Min(bp.clayCount + bp.clayPerMinute * (timeToWaitUntilItsBuilt + 1) - bp.obsidianRobotCost.clay, timeRemaining * bp.maxClayCost);
+                    bp.obsidianCount = Math.Min(bp.obsidianCount + bp.obsidianPerMinute * (timeToWaitUntilItsBuilt + 1), timeRemaining * bp.maxObsidianCost);
+                    bp.geodeCount += bp.geodePerMinute * (timeToWaitUntilItsBuilt + 1);
+                    ++bp.obsidianPerMinute;
 
-                if (temp > max)
-                    max = temp;
+                    int temp = TizenkilencedikJobbRek(bp, cache, timeRemaining);
+                    if (temp > max)
+                        max = temp;
+                    
+                    --bp.obsidianPerMinute;
+                    bp.oreCount = oldOreCount;
+                    bp.clayCount = oldClayCount;
+                    bp.obsidianCount = oldObsidianCount;
+                    bp.geodeCount = oldGeodeCount;
+                }
             }
-            //geode
-            if (bp.oreCount >= bp.geodeRobotCost.ore && bp.obsidianCount >= bp.geodeRobotCost.obsidian)
+
+            //geodeRobot
+            if (bp.obsidianPerMinute != 0)
             {
-                bp.oreCount -= bp.geodeRobotCost.ore;
-                bp.obsidianCount -= bp.geodeRobotCost.obsidian;
-                ++bp.geodePerMinute;
+                int timeToWaitUntilItsBuiltGeode = Math.Max((int)Math.Ceiling((bp.geodeRobotCost.obsidian - bp.obsidianCount) / (double)bp.obsidianPerMinute), (int)Math.Ceiling((bp.geodeRobotCost.ore - bp.oreCount) / (double)bp.orePerMinute));
 
-                int temp = TizenkilencedikRek(bp, timeLeft - 1);
+                if (timeToWaitUntilItsBuiltGeode < 0)
+                    timeToWaitUntilItsBuiltGeode = 0;
 
-                bp.geodeCount = 
-                --bp.geodePerMinute;
-                bp.oreCount = oldOreCount;
-                bp.obsidianCount = oldObsidianCount;
-                bp.geodeCount = oldGeodeCount;
+                int timeRemainingGeode = time - timeToWaitUntilItsBuiltGeode - 1;
+                if (timeRemainingGeode > 0)
+                {
+                    //Nem tárolunk többet, mint amennyit fel tudnánk használni (cache miatt)
+                    bp.oreCount = Math.Min(bp.oreCount + bp.orePerMinute * (timeToWaitUntilItsBuiltGeode + 1) - bp.geodeRobotCost.ore, timeRemainingGeode * bp.maxOreCost);
+                    bp.clayCount = Math.Min(bp.clayCount + bp.clayPerMinute * (timeToWaitUntilItsBuiltGeode + 1), timeRemainingGeode * bp.maxClayCost);
+                    bp.obsidianCount = Math.Min(bp.obsidianCount + bp.obsidianPerMinute * (timeToWaitUntilItsBuiltGeode + 1) - bp.geodeRobotCost.obsidian, timeRemainingGeode * bp.maxObsidianCost);
+                    bp.geodeCount += bp.geodePerMinute * (timeToWaitUntilItsBuiltGeode + 1);
+                    ++bp.geodePerMinute;
 
-                if (temp > max)
-                    max = temp;
+                    int temp = TizenkilencedikJobbRek(bp, cache, timeRemainingGeode);
+                    
+                    if (temp > max)
+                        max = temp;
+
+                    --bp.geodePerMinute;
+                    bp.oreCount = oldOreCount;
+                    bp.clayCount = oldClayCount;
+                    bp.obsidianCount = oldObsidianCount;
+                    bp.geodeCount = oldGeodeCount;
+                }
             }
 
-            int noAction = TizenkilencedikRek(bp, timeLeft - 1);
-
-            if (noAction > max)
-                return noAction;
-
+            cache.Add(key, max);
             return max;
+        }
+
+        class Node
+        {
+            public object Content { get; set; }
+            public Node Next { get; set; }
+            public Node Previous { get; set; }
+
+            public Node(object content)
+            {
+                this.Content = content;
+            }
+        }
+
+        class LinkedList<T>
+        {
+            public int Count()
+            {
+                return count;
+            }
+
+            private int count = 0;
+
+            public Node Fejelem { get; set; }
+            public LinkedList()
+            {
+                this.Fejelem = new Node(null);
+                this.Fejelem.Next = Fejelem;
+                this.Fejelem.Previous = Fejelem;
+                count = 0;
+            }
+
+            public void Add(T content)
+            {
+                Node node = new Node(content);
+
+                ++count;
+                if (count == 1)
+                {
+                    Fejelem = node;
+                    Fejelem.Next = Fejelem;
+                    Fejelem.Previous = Fejelem;
+                    return;
+                }
+
+                Node aktelem = Fejelem.Previous;
+
+                aktelem.Next = node;
+                node.Previous = aktelem;
+                node.Next = Fejelem;
+                Fejelem.Previous = node;
+            }
+
+            public bool Add(Node node)
+            {
+                if (!typeof(T).Equals(node.Content.GetType()))
+                    return false;
+
+                ++count;
+                if (count == 1)
+                {
+                    Fejelem = node;
+                    Fejelem.Next = Fejelem;
+                    return true;
+                }
+
+                Node aktelem = Fejelem;
+                while (aktelem.Next != Fejelem)
+                    aktelem = aktelem.Next;
+
+                aktelem.Next = node;
+                node.Previous = aktelem;
+                aktelem.Next.Next = Fejelem;
+                Fejelem.Previous = node;
+
+                return true;
+            }
+
+            public void Print()
+            {
+                Node aktelem = Fejelem.Next;
+                Console.Write(Fejelem.Content + " ");
+                while (aktelem != Fejelem)
+                {
+                    Console.Write(aktelem.Content + " ");
+                    aktelem = aktelem.Next;
+                }
+                Console.WriteLine();
+            }
+
+            public int IndexOf(Node node)
+            {
+                if (node == Fejelem)
+                    return 0;
+
+                int counter = 1;
+                Node aktelem = Fejelem.Next;
+                while (aktelem != node && aktelem != Fejelem)
+                {
+                    aktelem = aktelem.Next;
+                    ++counter;
+                }
+                if (counter == count)
+                    return -1;
+
+                return counter;
+            }
+
+            public bool Contains(Node node)
+            {
+                return this.IndexOf(node) != -1;
+            }
+            //új :
+            public void Move(Node node)
+            {
+                Node aktelem = Fejelem;
+                while (aktelem.Next != node)
+                    aktelem = aktelem.Next;
+
+                if (Fejelem == node)
+                    Fejelem = node.Next;
+
+                // AKT - NODE - TEMP => AKT - TEMP - NODE
+
+                Node temp = aktelem.Next.Next;
+
+                aktelem.Next = temp;
+
+                temp.Previous = aktelem;
+                node.Previous = temp;
+                node.Next = temp.Next; //X - X => X - O - X
+                temp.Next.Previous = node;
+                temp.Next = node;
+
+            }
+            public void MoveBack(Node node)
+            {
+                Node aktelem = node.Previous;
+
+                if (Fejelem == node)
+                    Fejelem = node.Next;
+
+                Node temp = aktelem.Previous;
+
+                node.Next.Previous = aktelem;
+                aktelem.Next = node.Next;
+
+                aktelem.Previous = node;
+                node.Next = aktelem;
+                temp.Next = node;
+                node.Previous = temp;
+                /*
+                if (node.Next == Fejelem)
+                    Fejelem = node;*/
+            }
+            public bool PlaceAfter(Node node, int where)
+            {
+                /*
+                if (!this.Contains(node))
+                    return false;*/
+
+                Node aktelem = Fejelem;
+                while (aktelem.Next != node)
+                    aktelem = aktelem.Next;
+
+                Node whereNode = GetNodeAt(where);
+
+                if (Fejelem == node)
+                    Fejelem = node.Next;
+
+                aktelem.Next = node.Next;// X - O - X => X - X
+ 
+                node.Next = whereNode.Next; //X - X => X - O - X
+                whereNode.Next = node;
+
+                return true;
+            }
+
+            #region comment
+            /*
+            //regi :
+            public bool Move(Node node)
+            {
+                if (!this.Contains(node))
+                    return false;
+
+                Node aktelem = Fejelem;
+                while (aktelem.Next != node)
+                    aktelem = aktelem.Next;
+
+                Node temp = node.Next.Next;
+
+                aktelem.Next = node.Next;
+                aktelem.Next.Next = node;
+                aktelem.Next.Next.Next = temp;
+
+                if (Fejelem == node)
+                    Fejelem = aktelem.Next;
+
+                return true;
+            }
+
+            public bool MoveBack(Node node)
+            {
+                if (!this.Contains(node))
+                    return false;
+
+                Node aktelem = Fejelem;
+                while (aktelem.Next.Next != node)
+                    aktelem = aktelem.Next;
+
+                Node temp = aktelem.Next;
+                Node temp2 = node.Next;
+
+                aktelem.Next = node;
+                aktelem.Next.Next = temp;
+                aktelem.Next.Next.Next = temp2;
+
+                return true;
+            }*/
+            #endregion
+
+            public Node GetNodeAt(int index)
+            {
+                Node aktelem = Fejelem;
+                while (index > 0)
+                {
+                    aktelem = aktelem.Next;
+                    --index;
+                }
+
+                return aktelem;
+            }
+
+            public bool Remove(Node node)
+            {
+                if (!Contains(node))
+                    return false;
+
+                Node aktelem = Fejelem;
+                while (aktelem.Next != node)
+                    aktelem = aktelem.Next;
+
+                aktelem.Next = node.Next;
+
+                return true;
+            }
+        }
+
+        public static void Huszadik()
+        {
+            LinkedList<int> linked = new LinkedList<int>();
+
+            List<Node> nodes = new List<Node>();
+
+            string[] s = File.ReadAllLines("huszadik.txt");
+            foreach (var item in s)
+            {
+                Node temp = new Node(int.Parse(item));
+                nodes.Add(temp);
+                linked.Add(temp);
+            }
+
+            double counter = 1;
+            /*
+            Console.WriteLine();
+            linked.Print();
+            Console.WriteLine();*/
+            foreach (var item in nodes)
+            {
+                Console.Write("\r{0}%  ", Math.Round(counter / (nodes.Count - 1) * 100, 2));
+
+                if ((int)item.Content == 0)
+                    continue;
+                int howMuch = 0;
+                if ((int)item.Content / (double)nodes.Count > 0)
+                {
+                    if ((int)item.Content < 0)
+                        howMuch = (int)item.Content + nodes.Count;
+                    else
+                        howMuch = (int)item.Content + nodes.Count;
+                }
+
+                howMuch %= nodes.Count - 1;
+
+                for (int i = 0; i < howMuch; i++)
+                {
+                    linked.Move(item);
+                }
+                for (int i = 0; i > howMuch; i--)
+                {
+                    linked.MoveBack(item);
+                }
+
+                ++counter;
+            }
+
+            int zeroNodeIndex = linked.IndexOf(nodes.Where(kk => (int)kk.Content == 0).First());
+            int firstNumber = (int)linked.GetNodeAt(zeroNodeIndex + 1000).Content;
+            int secondNumber = (int)linked.GetNodeAt(zeroNodeIndex + 2000).Content;
+            int thirdNumber = (int)linked.GetNodeAt(zeroNodeIndex + 3000).Content;
+
+            Console.WriteLine();
+            Console.WriteLine(firstNumber + " " + secondNumber + " " + thirdNumber);
+            Console.WriteLine("The sum of the three numbers that form the grove coordinates: " + (firstNumber + secondNumber + thirdNumber));
+            
+            //14 perc 45 sec volt
+
+            Console.WriteLine();
+        }
+
+        class YellingMonkeys
+        {
+            public static Dictionary<string, YellingMonkeys> Monkeys { get; set; }
+
+            private bool numberYeller { get; set; }
+
+            public long Number { get; set; }
+
+            public YellingMonkeys LeftSide { get; set; }
+            public YellingMonkeys RightSide { get; set; }
+
+            public Func<YellingMonkeys, YellingMonkeys, long> Operation;
+
+            public YellingMonkeys(int number)
+            {
+                this.numberYeller = true;
+                this.Number = number;
+            }
+            public YellingMonkeys()
+            {
+                this.numberYeller = false;
+            }
+
+            public bool isYeller() => numberYeller;
+
+            public long GetValue()
+            {
+                if (numberYeller)
+                    return Number;
+
+                return Operation(LeftSide, RightSide);
+            }
+
+            public static long operator +(YellingMonkeys a, YellingMonkeys b)
+            {
+                return a.GetValue() + b.GetValue();
+            }
+
+            public static long operator -(YellingMonkeys a, YellingMonkeys b)
+            {
+                return a.GetValue() - b.GetValue();
+            }
+
+            public static long operator /(YellingMonkeys a, YellingMonkeys b)
+            {
+                return a.GetValue() / b.GetValue();
+            }
+            public static long operator *(YellingMonkeys a, YellingMonkeys b)
+            {
+                return a.GetValue() * b.GetValue();
+            }
+        }
+
+        public static void Huszonegyedik()
+        {
+            string[] s = File.ReadAllLines("huszonegyedik.txt");
+
+            YellingMonkeys.Monkeys = new Dictionary<string, YellingMonkeys>();
+
+            //need all the monkeys first
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(':').Select(kk => kk.Trim()).ToArray();
+                
+                int number = -1;
+                if (int.TryParse(temp[1], out number))
+                    YellingMonkeys.Monkeys.Add(temp[0],new YellingMonkeys(number));
+                else
+                    YellingMonkeys.Monkeys.Add(temp[0], new YellingMonkeys());
+            }
+
+            //getting the operations
+            foreach (var item in s)
+            {
+                string[] temp = item.Split(':').Select(kk => kk.Trim()).ToArray();
+
+                if (YellingMonkeys.Monkeys[temp[0]].isYeller())
+                    continue;
+                
+                if (temp[1].Contains('+'))
+                {
+                    string[] theTwoMonkey = temp[1].Split('+').Select(kk => kk.Trim()).ToArray();
+                    YellingMonkeys.Monkeys[temp[0]].Operation = (kk, zz) => kk + zz;
+                    YellingMonkeys.Monkeys[temp[0]].LeftSide = YellingMonkeys.Monkeys[theTwoMonkey[0]];
+                    YellingMonkeys.Monkeys[temp[0]].RightSide = YellingMonkeys.Monkeys[theTwoMonkey[1]];
+                }
+                else if (temp[1].Contains('-'))
+                {
+                    string[] theTwoMonkey = temp[1].Split('-').Select(kk => kk.Trim()).ToArray();
+                    YellingMonkeys.Monkeys[temp[0]].Operation = (kk, zz) => kk - zz;
+                    YellingMonkeys.Monkeys[temp[0]].LeftSide = YellingMonkeys.Monkeys[theTwoMonkey[0]];
+                    YellingMonkeys.Monkeys[temp[0]].RightSide = YellingMonkeys.Monkeys[theTwoMonkey[1]];
+                }
+                else if (temp[1].Contains('/'))
+                {
+                    string[] theTwoMonkey = temp[1].Split('/').Select(kk => kk.Trim()).ToArray();
+                    YellingMonkeys.Monkeys[temp[0]].Operation = (kk, zz) => kk / zz;
+                    YellingMonkeys.Monkeys[temp[0]].LeftSide = YellingMonkeys.Monkeys[theTwoMonkey[0]];
+                    YellingMonkeys.Monkeys[temp[0]].RightSide = YellingMonkeys.Monkeys[theTwoMonkey[1]];
+                }
+                else if (temp[1].Contains('*'))
+                {
+                    string[] theTwoMonkey = temp[1].Split('*').Select(kk => kk.Trim()).ToArray();
+                    YellingMonkeys.Monkeys[temp[0]].Operation = (kk, zz) => kk * zz;
+                    YellingMonkeys.Monkeys[temp[0]].LeftSide = YellingMonkeys.Monkeys[theTwoMonkey[0]];
+                    YellingMonkeys.Monkeys[temp[0]].RightSide = YellingMonkeys.Monkeys[theTwoMonkey[1]];
+                }
+            }
+
+            Console.WriteLine("The root monkey will yell: " + YellingMonkeys.Monkeys["root"].GetValue());
+
+            //2. rész
+
+            Console.WriteLine("The number I need to yell is: ");
+        }
+
+        public static void Huszonkettedik()
+        {
+            string[] s = File.ReadAllLines("huszonkettedik.txt");
+            //List<List<char>> map = File.ReadAllLines("huszonkettedikproba.txt").Select(kk => kk.ToList()).ToList();
+            List<List<char>> map = new List<List<char>>();
+            foreach (var item in s)
+            {
+                if (item == "")
+                    break;
+
+                map.Add(item.ToList());
+            }
+            //-1 => 'R' | -2 => 'L'
+            List<int> movesList = new List<int>();
+
+            string moves = s.Last();
+            while (true)
+            {
+                int index = 0;
+                while (index != moves.Length && moves[index] != 'R' && moves[index] != 'L')
+                    ++index;
+
+                movesList.Add(int.Parse(moves.Substring(0, index)));
+
+                if (index == moves.Length)
+                    break;
+
+                movesList.Add(moves[index] == 'R' ? -1 : -2);
+                moves = moves.Substring(index + 1);
+            }
+
+
+            (int x, int y) pos = (0, 0);
+            while (map[pos.y][pos.x] != '.')
+            {
+                if (map[pos.y].Count - 1 == pos.x)
+                    pos = (0, pos.y + 1);
+                else
+                    pos = (pos.x + 1, pos.y);
+            }
+
+            (int x, int y) howToMove = (1, 0);
+
+            foreach (var item in movesList)
+            {
+                //R
+                if (item == -1)
+                {
+                    if (howToMove == (1, 0))
+                        howToMove = (0, 1);
+                    else if (howToMove == (0, 1))
+                        howToMove = (-1, 0);
+                    else if (howToMove == (-1, 0))
+                        howToMove = (0, -1);
+                    else if (howToMove == (0, -1))
+                        howToMove = (1, 0);
+                }
+                //L
+                else if (item == -2)
+                {
+                    if (howToMove == (1, 0))
+                        howToMove = (0, -1);
+                    else if (howToMove == (0, 1))
+                        howToMove = (1, 0);
+                    else if (howToMove == (-1, 0))
+                        howToMove = (0, 1);
+                    else if (howToMove == (0, -1))
+                        howToMove = (-1, 0);
+                }
+                //just move
+                else
+                    for (int i = 0; i < item; i++)
+                    {
+                        (int x, int y) nextPos = (pos.x + howToMove.x, pos.y + howToMove.y);
+
+                        //Vertical wrapping
+                        if (howToMove.y != 0)
+                        {
+                            if (nextPos.y < 0)
+                            {
+                                nextPos = (nextPos.x, map.Count - 1);
+                                while (nextPos.y >= 0 && (nextPos.x >= map[nextPos.y].Count || map[nextPos.y][nextPos.x] == ' '))
+                                    nextPos = (nextPos.x, nextPos.y - 1);
+
+                                if (nextPos.y == -1)
+                                    break;
+                            }
+                            else if (nextPos.y >= map.Count)
+                            {
+                                nextPos = (nextPos.x, 0);
+                                while (nextPos.y < map.Count && (nextPos.x >= map[nextPos.y].Count || map[nextPos.y][nextPos.x] == ' '))
+                                    nextPos = (nextPos.x, nextPos.y + 1);
+
+                                if (nextPos.y == map.Count)
+                                    break;
+                            }
+                            else if (howToMove.y == 1 && (nextPos.x >= map[nextPos.y].Count || map[nextPos.y][nextPos.x] == ' '))
+                            {
+                                nextPos = (nextPos.x, 0);
+                                while (nextPos.y < map.Count && (nextPos.x >= map[nextPos.y].Count || map[nextPos.y][nextPos.x] == ' '))
+                                    nextPos = (nextPos.x, nextPos.y + 1);
+
+                                if (nextPos.y == -1)
+                                    break;
+                            }
+                            else if (howToMove.y == -1 && map[nextPos.y][nextPos.x] == ' ')
+                            {
+                                nextPos = (nextPos.x, map.Count - 1);
+                                while (nextPos.y >= 0 && (nextPos.x >= map[nextPos.y].Count || map[nextPos.y][nextPos.x] == ' '))
+                                    nextPos = (nextPos.x, nextPos.y - 1);
+
+                                if (nextPos.y == -1)
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            //Horizontal wrapping
+                            if (nextPos.x < 0)
+                                nextPos = (map[nextPos.y].Count - 1, nextPos.y);
+                            else if (nextPos.x >= map[nextPos.y].Count)
+                            {
+                                nextPos = (0, nextPos.y);
+                                while (nextPos.x < map[nextPos.y].Count && map[nextPos.y][nextPos.x] == ' ')
+                                    nextPos = (nextPos.x + 1, nextPos.y);
+
+                                if (nextPos.x == map[nextPos.y].Count)
+                                    break;
+                            }
+                            else if (howToMove.x == 1 && map[nextPos.y][nextPos.x] == ' ')
+                            {
+                                nextPos = (0, nextPos.y);
+                                while (nextPos.x < map[nextPos.y].Count && map[nextPos.y][nextPos.x] == ' ')
+                                    nextPos = (nextPos.x + 1, nextPos.y);
+
+                                if (nextPos.x == map[nextPos.y].Count)
+                                    break;
+                            }
+                            else if (howToMove.x == -1 && map[nextPos.y][nextPos.x] == ' ')
+                                nextPos = (map[nextPos.y].Count - 1, nextPos.y);
+                        }
+
+                        if (map[nextPos.y][nextPos.x] != '.')
+                            break;
+
+                        pos = nextPos;
+                        /*
+                        //kiiras
+                        for (int j = 0; j < map.Count; j++)
+                        {
+                            for (int k = 0; k < map[j].Count; k++)
+                            {
+                                if((k,j) == pos)
+                                    Console.Write("$");
+                                else
+                                    Console.Write(map[j][k]);
+                            }
+                            Console.WriteLine();
+                        }
+                        Console.WriteLine("--------------------");
+                        Console.WriteLine();*/
+                    }
+            }
+
+            long facingValue = 0;
+            if (howToMove.y == -1)
+                facingValue = 1;
+            else if (howToMove.x == -1)
+                facingValue = 2;
+            else if (howToMove.y == 1)
+                facingValue = 3;
+
+            Console.WriteLine("The final password is: " + (1000 * (long)(pos.y + 1) + 4 * (long)(pos.x + 1) + facingValue));
+        }
+
+        class Elf
+        {
+            public (int x, int y) Position { get; set; }
+            public Elf((int x, int y) pos)
+            {
+                this.Position = pos;
+            }
+
+            //Handling them as tuples
+            public override bool Equals(object obj)
+            {
+                if (obj == null || !this.GetType().Equals(obj.GetType()))
+                    return false;
+
+                Elf a = (Elf)obj;
+                return this.Position == a.Position;
+            }
+
+            public override int GetHashCode()
+            {
+                return Position.GetHashCode();
+            }
+        }
+
+        public static void Huszonharmadik()
+        {
+            string[] s = File.ReadAllLines("huszonharmadik.txt");
+
+            HashSet<Elf> positions = new HashSet<Elf>();
+            for (int i = 0; i < s.Length; i++)
+                for (int j = 0; j < s[i].Length; j++)
+                    if (s[i][j] == '#')
+                        positions.Add(new Elf((j, i)));
+
+            Queue<int> directions = new Queue<int>();
+            directions.Enqueue(0);//North
+            directions.Enqueue(1);//South
+            directions.Enqueue(2);//West
+            directions.Enqueue(3);//East
+
+            int rounds = 0;
+            while (rounds < 10)
+            {
+                //Console.Write("\r{0} ",rounds);
+                bool hadToMove = false;
+                
+                Dictionary<(int x, int y), Elf> dic = new Dictionary<(int x, int y), Elf>();
+                foreach (var item in positions)
+                {
+                    bool jobbra = false;
+                    bool jobbrafel = false;
+                    bool fel = false;
+                    bool balrafel = false;
+                    bool balra = false;
+                    bool balrale = false;
+                    bool le = false;
+                    bool jobbrale = false;
+
+                    foreach (var i in positions)
+                    {
+                        //Jobbra
+                        if (i.Position == (item.Position.x + 1, item.Position.y))
+                            jobbra = true;
+                        //Balra
+                        else if (i.Position == (item.Position.x - 1, item.Position.y))
+                            balra = true;
+                        //Fel
+                        else if (i.Position == (item.Position.x, item.Position.y - 1))
+                            fel = true;
+                        //Le
+                        else if (i.Position == (item.Position.x, item.Position.y + 1))
+                            le = true;
+                        //Jobbrafel
+                        else if (i.Position == (item.Position.x + 1, item.Position.y - 1))
+                            jobbrafel = true;
+                        //Balrafel
+                        else if (i.Position == (item.Position.x - 1, item.Position.y - 1))
+                            balrafel = true;
+                        //Balrale
+                        else if (i.Position == (item.Position.x - 1, item.Position.y + 1))
+                            balrale = true;
+                        //Jobbrale
+                        else if (i.Position == (item.Position.x + 1, item.Position.y + 1))
+                            jobbrale = true;
+                    }
+
+                    if (!jobbra
+                        && !jobbrafel
+                        && !fel
+                        && !balrafel
+                        && !balra
+                        && !balrale
+                        && !le
+                        && !jobbrale)
+                    {
+                        continue;
+                    }
+                    hadToMove = true;
+
+                    //only 2 Elfs would move to the same position
+                    bool canMove = false;
+                    foreach (var dir in directions)
+                    {
+                        //North
+                        if (dir == 0 && !balrafel && !fel && !jobbrafel)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x, item.Position.y - 1)))
+                                dic.Add((item.Position.x, item.Position.y - 1), item);
+                            else
+                                dic.Remove((item.Position.x, item.Position.y - 1));
+
+                            break;
+                        }
+                        //South
+                        else if (dir == 1 && !balrale && !le && !jobbrale)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x, item.Position.y + 1)))
+                                dic.Add((item.Position.x, item.Position.y + 1), item);
+                            else
+                                dic.Remove((item.Position.x, item.Position.y + 1));
+
+                            break;
+                        }
+                        //West
+                        else if (dir == 2 && !balrale && !balra && !balrafel)
+                        {
+                            if (rounds == 1 && item.Position.x == 3 && item.Position.y == 1)
+                            {
+                                Console.WriteLine("MoveLeft");
+                                Console.WriteLine(balrale + " " + balra + " " + balrafel);
+                                Console.WriteLine(positions.Contains(new Elf((item.Position.x - 1, item.Position.y - 1))));
+
+                                foreach (var ii in positions)
+                                {
+                                    if (ii.Position == (2, 0))
+                                    {
+                                        Console.WriteLine("BROOOOOOOO");
+                                        break;
+                                    }
+                                }
+                                canMove = true;
+                                if (!dic.ContainsKey((item.Position.x - 1, item.Position.y)))
+                                    dic.Add((item.Position.x - 1, item.Position.y), item);
+                                else
+                                    dic.Remove((item.Position.x - 1, item.Position.y));
+
+                                break;
+                            }
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x - 1, item.Position.y)))
+                                dic.Add((item.Position.x - 1, item.Position.y), item);
+                            else
+                                dic.Remove((item.Position.x - 1, item.Position.y));
+
+                            break;
+                        }
+                        //East
+                        else if (dir == 3 && !jobbrale && !jobbra && !jobbrafel)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x + 1, item.Position.y)))
+                                dic.Add((item.Position.x + 1, item.Position.y), item);
+                            else
+                                dic.Remove((item.Position.x + 1, item.Position.y));
+
+                            break;
+                        }
+                    }
+                    if(!canMove)
+                        dic.Add((item.Position.x, item.Position.y), item);
+                }
+
+                ++rounds;
+
+                if (!hadToMove)
+                    break;
+
+                //Cycling the directions
+                directions.Enqueue(directions.Dequeue());
+
+                //Moving the pieces
+                foreach (var item in dic)
+                    item.Value.Position = item.Key;
+            }
+
+            //4254
+            Console.WriteLine("How many empty ground tiles does that rectangle contain? " + ((positions.Max(kk => kk.Position.x) - positions.Min(kk => kk.Position.x) + 1) * (positions.Max(kk => kk.Position.y) - positions.Min(kk => kk.Position.y) + 1) - positions.Count));
+
+            //2. rész
+
+            while (true)
+            {
+                //Console.Write("\r{0} ",rounds);
+                bool hadToMove = false;
+
+                Dictionary<(int x, int y), Elf> dic = new Dictionary<(int x, int y), Elf>();
+                foreach (var item in positions)
+                {
+                    bool jobbra = false;
+                    bool jobbrafel = false;
+                    bool fel = false;
+                    bool balrafel = false;
+                    bool balra = false;
+                    bool balrale = false;
+                    bool le = false;
+                    bool jobbrale = false;
+
+                    foreach (var i in positions)
+                    {
+                        //Jobbra
+                        if (i.Position == (item.Position.x + 1, item.Position.y))
+                            jobbra = true;
+                        //Balra
+                        else if (i.Position == (item.Position.x - 1, item.Position.y))
+                            balra = true;
+                        //Fel
+                        else if (i.Position == (item.Position.x, item.Position.y - 1))
+                            fel = true;
+                        //Le
+                        else if (i.Position == (item.Position.x, item.Position.y + 1))
+                            le = true;
+                        //Jobbrafel
+                        else if (i.Position == (item.Position.x + 1, item.Position.y - 1))
+                            jobbrafel = true;
+                        //Balrafel
+                        else if (i.Position == (item.Position.x - 1, item.Position.y - 1))
+                            balrafel = true;
+                        //Balrale
+                        else if (i.Position == (item.Position.x - 1, item.Position.y + 1))
+                            balrale = true;
+                        //Jobbrale
+                        else if (i.Position == (item.Position.x + 1, item.Position.y + 1))
+                            jobbrale = true;
+                    }
+
+                    if (!jobbra
+                        && !jobbrafel
+                        && !fel
+                        && !balrafel
+                        && !balra
+                        && !balrale
+                        && !le
+                        && !jobbrale)
+                    {
+                        continue;
+                    }
+                    hadToMove = true;
+
+                    //only 2 Elfs would move to the same position
+                    bool canMove = false;
+                    foreach (var dir in directions)
+                    {
+                        //North
+                        if (dir == 0 && !balrafel && !fel && !jobbrafel)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x, item.Position.y - 1)))
+                                dic.Add((item.Position.x, item.Position.y - 1), item);
+                            else
+                                dic.Remove((item.Position.x, item.Position.y - 1));
+
+                            break;
+                        }
+                        //South
+                        else if (dir == 1 && !balrale && !le && !jobbrale)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x, item.Position.y + 1)))
+                                dic.Add((item.Position.x, item.Position.y + 1), item);
+                            else
+                                dic.Remove((item.Position.x, item.Position.y + 1));
+
+                            break;
+                        }
+                        //West
+                        else if (dir == 2 && !balrale && !balra && !balrafel)
+                        {
+                            if (rounds == 1 && item.Position.x == 3 && item.Position.y == 1)
+                            {
+                                Console.WriteLine("MoveLeft");
+                                Console.WriteLine(balrale + " " + balra + " " + balrafel);
+                                Console.WriteLine(positions.Contains(new Elf((item.Position.x - 1, item.Position.y - 1))));
+
+                                foreach (var ii in positions)
+                                {
+                                    if (ii.Position == (2, 0))
+                                    {
+                                        Console.WriteLine("BROOOOOOOO");
+                                        break;
+                                    }
+                                }
+                                canMove = true;
+                                if (!dic.ContainsKey((item.Position.x - 1, item.Position.y)))
+                                    dic.Add((item.Position.x - 1, item.Position.y), item);
+                                else
+                                    dic.Remove((item.Position.x - 1, item.Position.y));
+
+                                break;
+                            }
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x - 1, item.Position.y)))
+                                dic.Add((item.Position.x - 1, item.Position.y), item);
+                            else
+                                dic.Remove((item.Position.x - 1, item.Position.y));
+
+                            break;
+                        }
+                        //East
+                        else if (dir == 3 && !jobbrale && !jobbra && !jobbrafel)
+                        {
+                            canMove = true;
+                            if (!dic.ContainsKey((item.Position.x + 1, item.Position.y)))
+                                dic.Add((item.Position.x + 1, item.Position.y), item);
+                            else
+                                dic.Remove((item.Position.x + 1, item.Position.y));
+
+                            break;
+                        }
+                    }
+                    if (!canMove)
+                        dic.Add((item.Position.x, item.Position.y), item);
+                }
+
+                ++rounds;
+
+                if (!hadToMove)
+                    break;
+
+                //Cycling the directions
+                directions.Enqueue(directions.Dequeue());
+
+                //Moving the pieces
+                foreach (var item in dic)
+                    item.Value.Position = item.Key;
+            }
+
+            Console.WriteLine(" What is the number of the first round where no Elf moves? " + rounds);
+        }
+
+        public class Wind
+        {
+            public static (int width, int height) BoardSize { get; set; }
+
+            //0 right | 1 up | 2 left | 3 down
+            public int Direction { get; set; }
+            public (int x, int y) Pos { get; set; }
+
+            public Wind((int x, int y) pos, int direction)
+            {
+                this.Pos = pos;
+                this.Direction = direction;
+            }
+
+            public Wind(Wind a)
+            {
+                this.Pos = a.Pos;
+                this.Direction = a.Direction;
+            }
+
+            public void Move()
+            {
+                (int x, int y) nextpos = (0,0);
+                switch(Direction)
+                {
+                    case 0:
+                        nextpos = (Pos.x + 1, Pos.y);
+                        break;
+                    case 1:
+                        nextpos = (Pos.x, Pos.y - 1);
+                        break;
+                    case 2:
+                        nextpos = (Pos.x - 1, Pos.y);
+                        break;
+                    case 3:
+                        nextpos = (Pos.x, Pos.y + 1);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (nextpos.x == BoardSize.width)
+                    nextpos.x = 1;
+                else if (nextpos.x == 0)
+                    nextpos.x = BoardSize.width - 1;
+                else if (nextpos.y == BoardSize.height)
+                    nextpos.y = 1;
+                else if (nextpos.y == 0)
+                    nextpos.y = BoardSize.height - 1;
+
+                Pos = nextpos;
+            }
+        }
+
+        public static void Huszonnegyedik()
+        {
+            string[] s = File.ReadAllLines("huszonnegyedik.txt");
+
+            Wind.BoardSize = (s[0].Length - 1, s.Length - 1);
+            List<Wind> winds = new List<Wind>();
+            for (int i = 0; i < s.Length; i++)
+                for (int j = 0; j < s[i].Length; j++)
+                {
+                    if (s[i][j] == '>')
+                        winds.Add(new Wind((j, i), 0));
+                    else if (s[i][j] == '^')
+                        winds.Add(new Wind((j, i), 1));
+                    else if (s[i][j] == '<')
+                        winds.Add(new Wind((j, i), 2));
+                    else if (s[i][j] == 'v')
+                        winds.Add(new Wind((j, i), 3));
+                }
+
+            int cycle = 0;
+
+            for (int i = 1; i < (s.Length - 2); i++)
+            {
+                int mult = (s[0].Length - 2) * i;
+                if (mult % (s.Length - 2) == 0)
+                    cycle = mult;
+            }
+            if (cycle == 0)
+                cycle = (s[0].Length - 2) * (s.Length - 2);
+
+            //Mikor nem lehet odalépni
+            List<List<HashSet<int>>> Tiles = new List<List<HashSet<int>>>();
+            for (int i = 0; i < s.Length - 2; i++)
+            {
+                List<HashSet<int>> temp = new List<HashSet<int>>();
+                for (int j = 0; j < s[i].Length - 2; j++)
+                    temp.Add(new HashSet<int>());
+                Tiles.Add(temp);
+            }
+
+            //needed for second part
+            foreach (var item in winds)
+                Tiles[item.Pos.y - 1][item.Pos.x - 1].Add(0);
+
+            for (int i = 1; i <= cycle; i++)
+            {
+                foreach (var item in winds)
+                {
+                    item.Move();
+                    Tiles[item.Pos.y - 1][item.Pos.x - 1].Add(i);
+                }
+            }
+
+            (int x, int y) winPos = (Tiles[0].Count - 1, Tiles.Count - 1);
+            int quickest = Tiles.Count * Tiles[0].Count;
+            HashSet<(int x, int y, int time)> tried = new HashSet<(int x, int y, int time)>();
+            for (int i = 1; i <= cycle; i++)
+            {
+                if (Tiles[0][0].Contains(i))
+                    continue;
+                
+                Queue<(int x, int y, int time)> q = new Queue<(int x, int y, int time)>();
+                q.Enqueue((0, 0, i));
+                while (q.Count != 0)
+                {
+                    var akt = q.Dequeue();
+
+                    if (akt.x == winPos.x && akt.y == winPos.y)
+                    {
+                        if (akt.time + 1 < quickest)
+                            quickest = akt.time + 1;
+                        continue;
+                    }
+                    
+                    if (akt.time >= quickest)
+                        continue;
+
+                    //marad
+                    if (!tried.Contains((akt.x, akt.y, akt.time + 1)))
+                        if (!Tiles[akt.y][akt.x].Contains((akt.time + 1)%cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y, akt.time + 1));
+                            tried.Add((akt.x, akt.y, akt.time + 1));
+                        }
+                    //jobbra
+                    if (!tried.Contains((akt.x + 1, akt.y, akt.time + 1)))
+                        if (akt.x + 1 < Tiles[0].Count && !Tiles[akt.y][akt.x + 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x + 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x + 1, akt.y, akt.time + 1));
+                        }
+                    //fel
+                    if (!tried.Contains((akt.x, akt.y - 1, akt.time + 1)))
+                        if (akt.y - 1 >= 0 && !Tiles[akt.y - 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y - 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y - 1, akt.time + 1));
+                        }
+                    //balra
+                    if (!tried.Contains((akt.x - 1, akt.y, akt.time + 1)))
+                        if (akt.x - 1 >= 0 && !Tiles[akt.y][akt.x - 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x - 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x - 1, akt.y, akt.time + 1));
+                        }
+                    //le
+                    if (!tried.Contains((akt.x, akt.y + 1, akt.time + 1)))
+                        if (akt.y + 1 < Tiles.Count && !Tiles[akt.y + 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y + 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y + 1, akt.time + 1));
+                        }
+                }
+            }
+            Console.WriteLine("The fewest number of minutes required to avoid the blizzards and reach the goal: " + quickest);
+
+            //2. rész
+
+            //From Finish to Start
+            int time = quickest;
+
+            winPos = (0, 0);
+            quickest = Tiles.Count * Tiles[0].Count + time;
+            tried.Clear();
+
+            for (int i = time; i <= cycle + time; i++)
+            {
+                if (Tiles[Tiles.Count - 1][Tiles[0].Count - 1].Contains(i % cycle))
+                    continue;
+
+                Queue<(int x, int y, int time)> q = new Queue<(int x, int y, int time)>();
+                q.Enqueue((Tiles[0].Count - 1, Tiles.Count - 1, i));
+                while (q.Count != 0)
+                {
+                    var akt = q.Dequeue();
+
+                    if (akt.x == winPos.x && akt.y == winPos.y)
+                    {
+                        if (akt.time + 1 < quickest)
+                            quickest = akt.time + 1;
+                        if(akt.time + 1 == 32)
+                            Console.WriteLine("kor: " + i);
+                        continue;
+                    }
+
+                    if (akt.time >= quickest)
+                        continue;
+
+                    //marad
+                    if (!tried.Contains((akt.x, akt.y, akt.time + 1)))
+                        if (!Tiles[akt.y][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y, akt.time + 1));
+                            tried.Add((akt.x, akt.y, akt.time + 1));
+                        }
+                    //jobbra
+                    if (!tried.Contains((akt.x + 1, akt.y, akt.time + 1)))
+                        if (akt.x + 1 < Tiles[0].Count && !Tiles[akt.y][akt.x + 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x + 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x + 1, akt.y, akt.time + 1));
+                        }
+                    //fel
+                    if (!tried.Contains((akt.x, akt.y - 1, akt.time + 1)))
+                        if (akt.y - 1 >= 0 && !Tiles[akt.y - 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y - 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y - 1, akt.time + 1));
+                        }
+                    //balra
+                    if (!tried.Contains((akt.x - 1, akt.y, akt.time + 1)))
+                        if (akt.x - 1 >= 0 && !Tiles[akt.y][akt.x - 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x - 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x - 1, akt.y, akt.time + 1));
+                        }
+                    //le
+                    if (!tried.Contains((akt.x, akt.y + 1, akt.time + 1)))
+                        if (akt.y + 1 < Tiles.Count && !Tiles[akt.y + 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y + 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y + 1, akt.time + 1));
+                        }
+                }
+            }
+
+            //From start to Finish again:
+
+            time = quickest;
+
+            winPos = (Tiles[0].Count - 1, Tiles.Count - 1);
+            quickest = Tiles.Count * Tiles[0].Count + time;
+            tried.Clear();
+
+            for (int i = time; i <= cycle + time; i++)
+            {
+                if (Tiles[0][0].Contains(i % cycle))
+                    continue;
+
+                Queue<(int x, int y, int time)> q = new Queue<(int x, int y, int time)>();
+                q.Enqueue((0, 0, i));
+                while (q.Count != 0)
+                {
+                    var akt = q.Dequeue();
+
+                    if (akt.x == winPos.x && akt.y == winPos.y)
+                    {
+                        if (akt.time + 1 < quickest)
+                            quickest = akt.time + 1;
+                        if (akt.time + 1 == 32)
+                            Console.WriteLine("kor: " + i);
+                        continue;
+                    }
+
+                    if (akt.time >= quickest)
+                        continue;
+
+                    //marad
+                    if (!tried.Contains((akt.x, akt.y, akt.time + 1)))
+                        if (!Tiles[akt.y][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y, akt.time + 1));
+                            tried.Add((akt.x, akt.y, akt.time + 1));
+                        }
+                    //jobbra
+                    if (!tried.Contains((akt.x + 1, akt.y, akt.time + 1)))
+                        if (akt.x + 1 < Tiles[0].Count && !Tiles[akt.y][akt.x + 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x + 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x + 1, akt.y, akt.time + 1));
+                        }
+                    //fel
+                    if (!tried.Contains((akt.x, akt.y - 1, akt.time + 1)))
+                        if (akt.y - 1 >= 0 && !Tiles[akt.y - 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y - 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y - 1, akt.time + 1));
+                        }
+                    //balra
+                    if (!tried.Contains((akt.x - 1, akt.y, akt.time + 1)))
+                        if (akt.x - 1 >= 0 && !Tiles[akt.y][akt.x - 1].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x - 1, akt.y, akt.time + 1));
+                            tried.Add((akt.x - 1, akt.y, akt.time + 1));
+                        }
+                    //le
+                    if (!tried.Contains((akt.x, akt.y + 1, akt.time + 1)))
+                        if (akt.y + 1 < Tiles.Count && !Tiles[akt.y + 1][akt.x].Contains((akt.time + 1) % cycle))
+                        {
+                            q.Enqueue((akt.x, akt.y + 1, akt.time + 1));
+                            tried.Add((akt.x, akt.y + 1, akt.time + 1));
+                        }
+                }
+            }
+
+            Console.WriteLine("What is the fewest number of minutes required to reach the goal, go back to the start, then reach the goal again? " + quickest);
+
+        }
+
+        public static void Huszonotodik()
+        {
+            string[] s = File.ReadAllLines("huszonotodik.txt");
+
+            long sum = 0;
+
+            foreach (var item in s)
+                sum += SNAFUToBaseTen(item);
+
+            Console.WriteLine("What SNAFU number do you supply to Bob's console? " + BaseTenToSNAFU(sum));
+        }
+
+        public static long SNAFUToBaseTen(string snafu)
+        {
+            Dictionary<char, int> dic = new Dictionary<char, int>();
+            dic.Add('=', -2);
+            dic.Add('-', -1);
+            dic.Add('0', 0);
+            dic.Add('1', 1);
+            dic.Add('2', 2);
+
+            long result = 0;
+
+            for (int i = 0; i < snafu.Length; i++)
+                result += dic[snafu[i]] * (long)Math.Pow(5, snafu.Length - i - 1);
+
+            return result;
+        }
+
+        public static string BaseTenToSNAFU(long baseTen)
+        {
+            string result = "";
+            long activeNumber = baseTen;
+            while (activeNumber != 0)
+            {
+                long remainder = activeNumber % 5;
+                bool tookAway = false;
+                if (remainder > 2)
+                {
+                    if (remainder == 4)
+                        result += "-";
+                    else
+                        result += "=";
+
+                    tookAway = true;
+                }
+                else
+                    result += remainder;
+
+                activeNumber = activeNumber / 5;
+                if (tookAway)
+                    activeNumber += 1;
+            }
+
+            string returnString = "";
+            foreach (var item in result.Reverse())
+                returnString += item;
+
+            return returnString;
         }
 
         private static string concatStack(Stack<string> stack)
@@ -2339,6 +3709,7 @@ namespace AdventOfCode2022
 
         static void Main(string[] args)
         {
+            
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
             Console.WriteLine("Melyik feladat: ");
@@ -2405,7 +3776,25 @@ namespace AdventOfCode2022
                     Tizennyolcadik();
                     break;
                 case 19:
-                    tizenKilencedik();
+                    TizenKilencedik();
+                    break;
+                case 20:
+                    Huszadik();
+                    break;
+                case 21:
+                    Huszonegyedik();
+                    break;
+                case 22:
+                    Huszonkettedik();
+                    break;
+                case 23:
+                    Huszonharmadik();
+                    break;
+                case 24:
+                    Huszonnegyedik();
+                    break;
+                case 25:
+                    Huszonotodik();
                     break;
                 default:
                     Console.WriteLine("Nincs ilyen feladat");

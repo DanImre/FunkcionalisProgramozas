@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KRx+W1myjf6+PPsebAqqdlu7H6p2JfTg2L43ZJQNdGlKcQy/xcslPH1Lsj6xtBv6ujxG+otXUtPIwhv1zyH5sA==",
+  "dgSpecHash": "3Ss0BHZthptemq0vMdYunCjHApxPwhN8W46yASdwZeUSj9DqmNZjJRu4nnxsRh2XO59Gh+1XMjnSjEwktYj2tw==",
   "success": true,
-  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\komplexbeadando_uuuhsk\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+  "projectFilePath": "E:\\----IMI----\\Egyetem\\FunkcionalisProgramozas\\Progalap\\komplexbeadando_UUUHSK\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\19dar\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
   ],
